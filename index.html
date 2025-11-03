@@ -58,7 +58,7 @@
     }
 
     .progress-bar {
-      height: 4px;
+      height: 5px;
       border-radius: 3px;
       margin-top: 6px;
       background: #e5e7eb;
@@ -69,6 +69,7 @@
       height: 100%;
       border-radius: 3px;
       transition: width 0.6s ease;
+      background: linear-gradient(to right, #ef4444, #facc15, #22c55e);
     }
 
     .card {
@@ -186,17 +187,16 @@
 
       const weekCards = semanas.map(s => {
         const val = parseFloat(row[headers.indexOf(s)]) || 0;
-        let color, barColor;
-
-        if (val >= 85) { color = "text-green-600"; barColor = "bg-green-500"; }
-        else if (val >= 70) { color = "text-yellow-600"; barColor = "bg-yellow-400"; }
-        else { color = "text-red-600"; barColor = "bg-red-500"; }
-
+        const color =
+          val >= 85 ? "text-green-600" :
+          val >= 70 ? "text-yellow-600" : "text-red-600";
         return `
           <div class="week-card">
             <div class="text-[11px] text-gray-500 font-medium">${s}</div>
-            <div class="text-base font-bold mt-1 ${color}">${val || "—"}</div>
-            <div class="progress-bar"><div class="progress-fill ${barColor}" style="width:${Math.min(val,100)}%"></div></div>
+            <div class="text-base font-bold mt-1 ${color}">${val ? val.toFixed(0) + '%' : '—'}</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${Math.min(val,100)}%"></div>
+            </div>
           </div>`;
       }).join("");
 
@@ -209,7 +209,7 @@
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 mb-3">${weekCards}</div>
           <div class="pt-2 border-t border-gray-100 text-center">
             <div class="text-[11px] text-gray-600 font-medium">Total General</div>
-            <div class="text-xl font-bold text-indigo-700 mt-0.5">${total}</div>
+            <div class="text-xl font-bold text-indigo-700 mt-0.5">${total ? total + '%' : '—'}</div>
           </div>
         </div>`;
     }
