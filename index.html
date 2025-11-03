@@ -3,176 +3,153 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Evaluación de Calidad | Buscador por DNI</title>
+  <title>Buscador | Notas de Calidad</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Librerías externas -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
   <style>
-    .fade-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
     }
+
     .spinner {
-      border: 4px solid #e5e7eb;
-      border-top: 4px solid #3b82f6;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(148, 163, 184, 0.3);
+      border-top: 3px solid #4f46e5;
       border-radius: 50%;
-      width: 36px; height: 36px;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin { 0%{transform:rotate(0)}100%{transform:rotate(360deg)} }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.2);
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes ripple { to { transform: scale(2.5); opacity: 0; } }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 15px -4px rgba(0,0,0,0.06);
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .week-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 0.75rem;
+      text-align: center;
+      transition: all 0.25s ease;
+    }
+
+    .week-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    }
+
+    header { height: 64px; }
   </style>
 </head>
-
-<body class="bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen text-gray-800 font-sans">
+<body class="min-h-screen text-gray-800">
 
   <!-- 🔝 MENÚ FIJO -->
-  <header class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-40">
-    <nav class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold">QC</div>
-        <h1 class="font-semibold text-gray-800 text-lg">Evaluación de Calidad</h1>
+  <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm">
+    <div class="max-w-4xl mx-auto px-5 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">NQ</div>
+        <div>
+          <div class="text-sm font-semibold text-gray-800 leading-tight">Notas de Calidad</div>
+          <div class="text-[11px] text-gray-500 leading-tight">Buscador</div>
+        </div>
       </div>
-      <div class="flex items-center gap-6 text-sm font-medium text-gray-600">
-        <a href="index.html" class="hover:text-blue-600 transition-colors">Inicio</a>
-        <a href="reportes.html" class="hover:text-blue-600 transition-colors">Reportes</a>
-        <a href="configuracion.html" class="hover:text-blue-600 transition-colors">Configuración</a>
-        <a href="ayuda.html" class="hover:text-blue-600 transition-colors">Ayuda</a>
-      </div>
-    </nav>
+      <div class="text-[11px] text-gray-400 hidden sm:block">🔍 DNI → Resultados rápidos</div>
+    </div>
   </header>
 
-  <!-- 🌐 CONTENIDO PRINCIPAL -->
-  <main class="pt-28 pb-16 px-4">
-    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-2xl border border-gray-200 p-8 fade-in">
-      <div class="text-center mb-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-1">🔍 Busca la Evaluación por DNI</h2>
-        <p class="text-gray-600 text-sm">Ingresa el DNI del asesor para ver sus resultados de calidad.</p>
-      </div>
+  <!-- 🌐 CONTENIDO -->
+  <main class="pt-24 pb-16 px-4">
+    <div class="max-w-xl mx-auto text-center fade-in">
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">Buscar agente por DNI</h1>
+      <p class="text-gray-500 mb-6 text-sm">Consulta sus notas semanales y el total general.</p>
 
-      <!-- Búsqueda -->
       <div class="relative max-w-sm mx-auto">
-        <input
-          id="searchInput"
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <input id="dniInput"
           type="text"
-          maxlength="8"
-          placeholder="Ejemplo: 70234567"
-          class="w-full pl-12 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-800 text-center text-sm"
-        />
-        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🪪</div>
+          inputmode="numeric"
+          placeholder="Ingresa DNI"
+          class="w-full pl-9 pr-3 py-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none text-gray-800 text-sm text-center">
       </div>
 
-      <div class="text-center mt-4">
-        <button
-          id="searchBtn"
-          class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg shadow hover:opacity-95 transition-opacity"
-        >
-          Buscar
-        </button>
-      </div>
+      <button id="searchBtn"
+        class="mt-4 relative px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg active:scale-95 transition-all duration-200 flex items-center justify-center gap-1 mx-auto text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        Buscar
+      </button>
+    </div>
 
-      <!-- Resultados -->
-      <section id="resultsContainer" class="hidden mt-10 fade-in">
-        <div class="flex justify-between items-center mb-6">
-          <p id="infoText" class="text-sm font-medium text-gray-700"></p>
-          <button id="resetBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Restablecer</button>
-        </div>
+    <!-- ⏳ LOADING -->
+    <div id="loadingOverlay" class="hidden flex flex-col items-center justify-center py-10 fade-in">
+      <div class="spinner mb-3"></div>
+      <p class="text-gray-600 text-sm font-medium">Buscando agente…</p>
+    </div>
 
-        <div id="loadingOverlay" class="hidden flex justify-center py-8">
-          <div class="text-center">
-            <div class="spinner mx-auto mb-2"></div>
-            <p class="text-gray-600 text-sm">Buscando resultados...</p>
-          </div>
-        </div>
+    <!-- 📋 RESULTADOS -->
+    <div id="resultsContainer" class="max-w-2xl mx-auto mt-8 hidden"></div>
 
-        <div id="resultsList" class="space-y-5"></div>
-      </section>
-
-      <!-- Mensaje inicial -->
-      <div id="welcomeMessage" class="text-center text-gray-500 mt-10 text-sm fade-in">
-        <p>Los resultados aparecerán aquí después de realizar una búsqueda por DNI.</p>
-      </div>
+    <!-- 💬 MENSAJE INICIAL -->
+    <div id="welcomeMessage" class="text-center text-gray-500 mt-12 fade-in">
+      <p class="text-sm">Introduce un DNI para ver las notas de calidad del agente.</p>
     </div>
   </main>
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSurBIXBz-zxgpeTzfypry62oOkEvUpRZ-NK7XopbQbCz87sZJFuBUhPTBS17HVxHLuO0kYPe2r3YT0/pub?gid=213572123&single=true&output=csv";
-    
-    let allData = [];
+    let data = [];
     let headers = [];
 
+    const dniInput = document.getElementById("dniInput");
+    const searchBtn = document.getElementById("searchBtn");
     const resultsContainer = document.getElementById("resultsContainer");
     const welcomeMessage = document.getElementById("welcomeMessage");
     const loadingOverlay = document.getElementById("loadingOverlay");
-    const resultsList = document.getElementById("resultsList");
-    const infoText = document.getElementById("infoText");
 
-    function showMessage(msg, icon="success") {
-      Swal.fire({
-        toast: true,
-        position: 'bottom-end',
-        icon: icon,
-        title: msg,
-        showConfirmButton: false,
-        timer: 2000
-      });
-    }
-
-    function getColorClass(value) {
-      const num = parseFloat(value);
-      if (isNaN(num)) return "text-gray-500";
-      if (num >= 85) return "text-green-600";
-      return "text-red-600";
-    }
-
-    function renderResults(rows) {
-      resultsList.innerHTML = "";
-
-      if (rows.length === 0) {
-        resultsList.innerHTML = `
-          <div class="text-center py-10">
-            <div class="text-gray-400 text-5xl mb-3">📭</div>
-            <p class="text-gray-600 text-sm">No se encontraron resultados para ese DNI.</p>
-          </div>`;
-        return;
-      }
-
-      rows.forEach((row) => {
-        const nombre = row[1] || "Asesor sin nombre";
-        const notas = row.slice(2, 7);
-        let totalValue = 0, valid = 0;
-
-        notas.forEach(v => {
-          const num = parseFloat(v);
-          if (!isNaN(num)) { totalValue += num; valid++; }
-        });
-
-        const promedio = valid ? (totalValue / valid).toFixed(1) : "—";
-
-        const notaHTML = notas.map((n, i) => `
-          <div class="p-2.5 bg-gray-50 rounded-lg">
-            <div class="text-xs text-gray-500 mb-1">Semana ${i + 1}</div>
-            <div class="text-base font-semibold ${getColorClass(n)}">${n || "—"}%</div>
-          </div>`).join("");
-
-        const card = document.createElement("div");
-        card.className = "bg-white rounded-xl shadow p-5 border border-gray-100 hover:shadow-lg transition-shadow fade-in";
-        card.innerHTML = `
-          <h2 class="text-lg font-semibold text-blue-800 mb-3">👤 ${nombre}</h2>
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">${notaHTML}</div>
-          <div class="mt-4 text-center border-t pt-3">
-            <span class="text-xs text-gray-500 block">Total General</span>
-            <div class="text-2xl font-bold text-indigo-700">${promedio}%</div>
-          </div>`;
-        resultsList.appendChild(card);
-      });
-
-      showMessage("Búsqueda completada exitosamente ✅");
-    }
-
-    function searchByDNI(dni) {
-      return allData.filter(row => String(row[0]).trim() === dni);
+    // 🌊 Ripple effect
+    function createRipple(event) {
+      const button = event.currentTarget;
+      const circle = document.createElement("span");
+      const diameter = Math.max(button.clientWidth, button.clientHeight);
+      const radius = diameter / 2;
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+      circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+      circle.classList.add("ripple");
+      const ripple = button.getElementsByClassName("ripple")[0];
+      if (ripple) ripple.remove();
+      button.appendChild(circle);
     }
 
     async function loadCSV() {
@@ -181,48 +158,104 @@
         const text = await response.text();
         const parsed = Papa.parse(text, { skipEmptyLines: true });
         headers = parsed.data[0];
-        allData = parsed.data.slice(1);
+        data = parsed.data.slice(1);
       } catch (err) {
-        showMessage("Error al cargar los datos", "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al cargar los datos',
+          text: 'No se pudieron cargar las notas. Intenta más tarde.',
+          confirmButtonText: 'Entendido'
+        });
       }
     }
 
-    document.getElementById("searchBtn").addEventListener("click", () => {
-      const dni = document.getElementById("searchInput").value.trim();
-      if (!/^\d{8}$/.test(dni)) {
-        showMessage("Por favor ingresa un DNI válido (8 dígitos)", "warning");
-        return;
-      }
+    function showMessage(msg, icon = 'info') {
+      Swal.fire({
+        toast: true,
+        position: 'bottom-end',
+        icon,
+        title: msg,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+      });
+    }
 
-      if (!allData.length) {
-        showMessage("Cargando datos, intenta de nuevo...", "info");
+    function buscarPorDNI(dni) {
+      const dniIndex = headers.indexOf("DNI");
+      return data.find(row => row[dniIndex] === dni);
+    }
+
+    function renderCard(row) {
+      const name = row[headers.indexOf("Agente")] || "—";
+      const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
+      const total = row[headers.indexOf("Totalgeneral")] || "—";
+
+      const weekCards = semanas.map(s => {
+        const val = row[headers.indexOf(s)] || "—";
+        const color = val !== "—" && !isNaN(val)
+          ? (val < 85 ? 'text-red-600' : 'text-green-600')
+          : 'text-gray-500';
+        return `
+          <div class="week-card">
+            <div class="text-[11px] text-gray-500 font-medium">${s}</div>
+            <div class="text-lg font-bold mt-1 ${color}">${val}</div>
+          </div>`;
+      }).join("");
+
+      resultsContainer.innerHTML = `
+        <div class="card fade-in">
+          <div class="text-center mb-4">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 font-bold text-lg mb-2">
+              ${name.charAt(0).toUpperCase()}
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">${name}</h2>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">${weekCards}</div>
+          <div class="pt-3 border-t border-gray-100 text-center">
+            <div class="text-xs text-gray-600 font-medium">Total General</div>
+            <div class="text-2xl font-bold text-indigo-700 mt-1">${total}</div>
+          </div>
+        </div>`;
+    }
+
+    function noResults() {
+      resultsContainer.innerHTML = `
+        <div class="card fade-in text-center py-8">
+          <div class="text-red-500 text-4xl mb-2">⚠️</div>
+          <h3 class="text-base font-semibold text-gray-800 mb-1">Agente no encontrado</h3>
+          <p class="text-gray-600 text-sm">Verifica el DNI e inténtalo nuevamente.</p>
+        </div>`;
+    }
+
+    searchBtn.addEventListener("click", (event) => {
+      createRipple(event);
+      const dni = dniInput.value.trim();
+      if (!/^\d{7,8}$/.test(dni)) {
+        showMessage("Por favor ingresa un DNI válido", "warning");
         return;
       }
 
       loadingOverlay.classList.remove("hidden");
-      resultsContainer.classList.remove("hidden");
+      resultsContainer.classList.add("hidden");
       welcomeMessage.classList.add("hidden");
 
       setTimeout(() => {
-        const results = searchByDNI(dni);
-        renderResults(results);
-        infoText.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+        const result = buscarPorDNI(dni);
         loadingOverlay.classList.add("hidden");
-      }, 500);
+        if (result) {
+          renderCard(result);
+          resultsContainer.classList.remove("hidden");
+          showMessage("✅ Búsqueda completada", "success");
+        } else {
+          noResults();
+          resultsContainer.classList.remove("hidden");
+          showMessage("❌ Agente no encontrado", "error");
+        }
+      }, 600);
     });
 
-    document.getElementById("searchInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") document.getElementById("searchBtn").click();
-    });
-
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      document.getElementById("searchInput").value = "";
-      resultsContainer.classList.add("hidden");
-      welcomeMessage.classList.remove("hidden");
-      resultsList.innerHTML = "";
-      infoText.textContent = "";
-      showMessage("Búsqueda restablecida");
-    });
+    dniInput.addEventListener("keydown", e => { if (e.key === "Enter") searchBtn.click(); });
 
     loadCSV();
   </script>
