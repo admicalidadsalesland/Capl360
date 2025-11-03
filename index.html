@@ -4,84 +4,104 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buscador CSV | Google Sheets</title>
+  <!-- Corregidos espacios en URLs -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
   <style>
-    body {
-      background: linear-gradient(to bottom right, #0f172a, #1e293b);
-      color: #f1f5f9;
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-    }
     .spinner {
-      border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top: 4px solid #38bdf8;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #3b82f6;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
+      width: 40px;
+      height: 40px;
       animation: spin 1s linear infinite;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
-<body>
-  <!-- MENU FIJO -->
-  <header class="fixed top-0 left-0 right-0 bg-slate-800/90 backdrop-blur-md shadow-md z-40">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen text-gray-800 font-sans">
+
+  <!-- MENÚ FIJO (solo logo/título) -->
+  <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-sm z-40">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 flex items-center justify-center text-white font-bold">CSV</div>
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">CSV</div>
         <div>
-          <div class="text-sm font-semibold text-white">Buscador CSV</div>
-          <div class="text-xs text-gray-300">Datos desde Google Sheets</div>
+          <div class="text-sm font-semibold">Buscador de Datos</div>
+          <div class="text-xs text-gray-500">Google Sheets</div>
         </div>
       </div>
-      <div class="text-sm text-gray-300">v1.0</div>
     </div>
   </header>
 
-  <!-- CONTENIDO -->
-  <main class="pt-28 max-w-4xl mx-auto px-4 pb-16">
-    <!-- BUSCADOR -->
-    <section class="mb-10 text-center">
-      <h1 class="text-3xl font-semibold mb-2">Buscador de Datos</h1>
-      <p class="text-gray-300 mb-6">Ingresa una palabra clave y presiona Enter o Buscar</p>
-      <div class="flex items-center justify-center gap-2">
-        <input id="searchInput" type="text" placeholder="Ejemplo: cliente, código, ciudad..."
-          class="pl-4 pr-4 py-3 rounded-lg w-96 bg-slate-100 text-slate-900 focus:ring-4 focus:ring-sky-400 outline-none" />
-        <button id="searchBtn"
-          class="px-5 py-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white shadow-lg flex items-center gap-2 transition">
-          🔍 Buscar
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="pt-28 pb-16 px-4">
+    <div class="max-w-3xl mx-auto text-center">
+
+      <!-- Sección de búsqueda (siempre visible) -->
+      <div class="mb-12 fade-in">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">🔍 Busca en tus datos</h1>
+        <p class="text-gray-600 mb-6">Ingresa palabras clave para filtrar la información.</p>
+
+        <div class="relative max-w-lg mx-auto">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Escribe algo y presiona Enter..."
+            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-800"
+          />
+          <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</div>
+        </div>
+
+        <button
+          id="searchBtn"
+          class="mt-4 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg shadow hover:opacity-90 transition-opacity"
+        >
+          Buscar
         </button>
       </div>
-      <p id="infoText" class="mt-4 text-sm text-gray-400"></p>
-    </section>
 
-    <!-- TABLA -->
-    <section id="resultsSection" class="hidden">
-      <div class="relative bg-white rounded-2xl shadow-lg overflow-hidden text-slate-900">
-        <div id="loadingOverlay"
-          class="hidden absolute inset-0 bg-white/80 flex items-center justify-center z-30">
-          <div class="spinner"></div>
+      <!-- Contenedor de resultados (oculto por defecto) -->
+      <div id="resultsContainer" class="hidden fade-in">
+        <div class="flex justify-between items-center mb-4">
+          <p id="infoText" class="text-sm text-gray-600 font-medium"></p>
+          <button id="resetBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Restablecer</button>
         </div>
 
-        <div class="overflow-x-auto">
-          <table id="resultsTable" class="w-full table-auto border-collapse">
-            <thead id="tableHead" class="bg-slate-100 sticky top-0 z-10"></thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
+        <div class="relative bg-white rounded-xl shadow overflow-hidden border border-gray-200">
+          <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+            <div class="text-center">
+              <div class="spinner mx-auto mb-2"></div>
+              <p class="text-gray-600 text-sm">Buscando...</p>
+            </div>
+          </div>
 
-        <div class="p-4 border-t bg-slate-50 flex items-center justify-between">
-          <div class="text-sm text-gray-600">Usa palabras clave o códigos específicos para filtrar resultados.</div>
-          <button id="resetBtn" class="text-sm px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 transition">Restablecer</button>
+          <div class="overflow-x-auto max-h-[60vh]">
+            <table id="resultsTable" class="w-full table-auto text-sm">
+              <thead id="tableHead" class="bg-gray-50 sticky top-0"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </section>
+
+      <!-- Mensaje inicial (solo al inicio) -->
+      <div id="welcomeMessage" class="text-gray-500 mt-8">
+        <p>Los resultados aparecerán aquí después de realizar una búsqueda.</p>
+      </div>
+    </div>
   </main>
 
   <script>
@@ -89,39 +109,52 @@
     let allData = [];
     let headers = [];
 
+    const resultsContainer = document.getElementById("resultsContainer");
+    const welcomeMessage = document.getElementById("welcomeMessage");
     const loadingOverlay = document.getElementById("loadingOverlay");
     const tableHead = document.getElementById("tableHead");
     const tableBody = document.getElementById("tableBody");
     const infoText = document.getElementById("infoText");
-    const resultsSection = document.getElementById("resultsSection");
+
+    // Escapar HTML para seguridad
+    function escapeHtml(text) {
+      if (typeof text !== 'string') return text || '';
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "<")
+        .replace(/>/g, ">");
+    }
 
     function showLoading(show) {
       loadingOverlay.classList.toggle("hidden", !show);
     }
 
     function renderTable(rows) {
-      // header
+      if (headers.length === 0) return;
+
+      // Encabezado
       tableHead.innerHTML = "";
       const headRow = document.createElement("tr");
-      headRow.innerHTML = `<th class='text-left py-3 px-3 text-xs text-gray-500'>#</th>` +
-        headers.slice(0, 8).map(h => `<th class='text-left py-3 px-3 text-xs text-gray-500'>${h}</th>`).join('') +
-        `<th class='text-left py-3 px-3 text-xs text-gray-500'>Más...</th>`;
+      headRow.innerHTML = `<th class="text-left py-3 px-4 text-xs font-medium text-gray-500">#</th>` +
+        headers.slice(0, 8).map(h => `<th class="text-left py-3 px-4 text-xs font-medium text-gray-500">${escapeHtml(h)}</th>`).join('') +
+        `<th class="text-left py-3 px-4 text-xs font-medium text-gray-500">Más...</th>`;
       tableHead.appendChild(headRow);
 
-      // body
+      // Cuerpo
       tableBody.innerHTML = "";
       if (rows.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="${headers.length + 2}" class="py-12 text-center text-gray-500">No se encontraron resultados.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="10" class="py-10 text-center text-gray-500">No se encontraron resultados.</td></tr>`;
         return;
       }
 
-      rows.forEach((r, i) => {
+      rows.forEach((row, i) => {
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50";
+        tr.className = "hover:bg-gray-50 border-b border-gray-100";
         tr.innerHTML = `
-          <td class='py-3 px-3 text-sm text-gray-600'>${i + 1}</td>
-          ${headers.slice(0,8).map((_, idx) => `<td class='py-3 px-3 text-sm'>${r[idx] || ""}</td>`).join("")}
-          <td class='py-3 px-3 text-sm text-gray-500'>${r.slice(8).join(" — ")}</td>`;
+          <td class="py-3 px-4 text-gray-600">${i + 1}</td>
+          ${headers.slice(0, 8).map((_, idx) => `<td class="py-3 px-4">${escapeHtml(row[idx] || "")}</td>`).join("")}
+          <td class="py-3 px-4 text-gray-500">${escapeHtml(row.slice(8).filter(Boolean).join(" — "))}</td>
+        `;
         tableBody.appendChild(tr);
       });
     }
@@ -129,64 +162,80 @@
     function searchCSV(query) {
       const q = query.trim().toLowerCase();
       if (!q) return [];
-      return allData.filter(r => r.join(" — ").toLowerCase().includes(q));
+      return allData.filter(row =>
+        row.some(cell => cell && cell.toString().toLowerCase().includes(q))
+      );
     }
 
-    function showMessage(msg, icon = 'success') {
+    function showMessage(msg) {
       Swal.fire({
         toast: true,
         position: 'bottom-end',
-        icon,
+        icon: 'info',
         title: msg,
         showConfirmButton: false,
-        timer: 2500,
-        background: '#0f172a',
-        color: '#f8fafc'
+        timer: 2000,
+        timerProgressBar: true
       });
     }
 
     async function loadCSV() {
       try {
         const response = await fetch(CSV_URL);
+        if (!response.ok) throw new Error("Error al cargar el CSV");
         const text = await response.text();
         const parsed = Papa.parse(text, { skipEmptyLines: true });
-        headers = parsed.data[0];
-        allData = parsed.data.slice(1);
-        infoText.textContent = `${allData.length} filas cargadas`;
+        headers = parsed.data[0] || [];
+        allData = parsed.data.slice(1).filter(row => row.some(cell => String(cell).trim()));
       } catch (e) {
-        infoText.textContent = "Error cargando CSV: " + e;
+        console.error("Error:", e);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron cargar los datos. Verifica la URL del CSV.',
+          confirmButtonText: 'OK'
+        });
       }
     }
 
-    // Event Listeners
-    document.getElementById("searchBtn").addEventListener("click", async () => {
+    // Eventos
+    document.getElementById("searchBtn").addEventListener("click", () => {
       const query = document.getElementById("searchInput").value;
-      if (!query.trim()) {
-        showMessage("Ingresa un texto para buscar", "warning");
+      if (!allData.length) {
+        showMessage("Cargando datos...");
         return;
       }
+
       showLoading(true);
-      resultsSection.classList.remove("hidden");
-      await new Promise(r => setTimeout(r, 500));
-      const results = searchCSV(query);
-      renderTable(results);
-      infoText.textContent = `${allData.length} filas cargadas · ${results.length} mostradas`;
-      showLoading(false);
-      showMessage(`Notas de Calidad Cargadas: ${results.length} resultados`);
+      setTimeout(() => {
+        const results = searchCSV(query);
+        renderTable(results);
+        infoText.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrados`;
+
+        // Mostrar resultados
+        welcomeMessage.classList.add("hidden");
+        resultsContainer.classList.remove("hidden");
+
+        showLoading(false);
+        showMessage(`Notas de Calidad Cargadas`);
+      }, 300);
     });
 
     document.getElementById("searchInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") document.getElementById("searchBtn").click();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("searchBtn").click();
+      }
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
       document.getElementById("searchInput").value = "";
-      resultsSection.classList.add("hidden");
-      infoText.textContent = `${allData.length} filas cargadas`;
+      resultsContainer.classList.add("hidden");
+      welcomeMessage.classList.remove("hidden");
       showMessage("Búsqueda restablecida");
     });
 
-    // Inicializar
+    // Inicializar carga de datos (en segundo plano)
     loadCSV();
   </script>
 </body>
