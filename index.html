@@ -3,170 +3,228 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buscador | Notas de Calidad</title>
+  <title>Evaluación de Calidad | Buscador por DNI</title>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    .spinner {
-      border: 4px solid #e5e7eb;
-      border-top: 4px solid #3b82f6;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
+    /* Animaciones */
     .fade-in { animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    .card {
-      @apply bg-white rounded-xl shadow border border-gray-200 p-6 mb-6 transition-transform transform hover:-translate-y-1 hover:shadow-md;
+    .spinner {
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      animation: spin 1s linear infinite;
     }
+    @keyframes spin { 0%{transform:rotate(0)}100%{transform:rotate(360deg)} }
   </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen text-gray-800 font-sans">
 
-  <!-- MENÚ FIJO -->
+  <!-- 🔝 MENÚ FIJO -->
   <header class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-40">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center">
+    <nav class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold">CSV</div>
-        <div>
-          <div class="text-sm font-semibold">Buscador de Agentes</div>
-          <div class="text-xs text-gray-500">Notas de Calidad</div>
-        </div>
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold">QC</div>
+        <h1 class="font-semibold text-gray-800 text-lg">Evaluación de Calidad</h1>
       </div>
-    </div>
+      <div class="flex items-center gap-6 text-sm font-medium text-gray-600">
+        <a href="#" class="hover:text-blue-600 transition-colors">Inicio</a>
+        <a href="#" class="hover:text-blue-600 transition-colors">Reportes</a>
+        <a href="#" class="hover:text-blue-600 transition-colors">Configuración</a>
+      </div>
+    </nav>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- 🌐 CONTENIDO PRINCIPAL -->
   <main class="pt-28 pb-16 px-4">
     <div class="max-w-4xl mx-auto text-center fade-in">
-      <h1 class="text-2xl font-bold text-gray-800 mb-2">🔍 Buscar Agente por DNI</h1>
-      <p class="text-gray-600 mb-6">Consulta sus notas de calidad semanales</p>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">🔍 Busca la Evaluación por DNI</h2>
+      <p class="text-gray-600 mb-6">Ingresa el DNI del asesor para ver sus resultados.</p>
 
-      <div class="relative max-w-md mx-auto">
-        <input id="dniInput" type="text" placeholder="Ej: 3882225"
-          class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-800">
+      <!-- Búsqueda -->
+      <div class="relative max-w-sm mx-auto">
+        <input
+          id="searchInput"
+          type="text"
+          maxlength="8"
+          placeholder="Ejemplo: 70234567"
+          class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-800 text-center"
+        />
         <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🪪</div>
       </div>
 
-      <button id="searchBtn"
-        class="mt-4 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg shadow hover:opacity-95 transition-opacity">
+      <button
+        id="searchBtn"
+        class="mt-4 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg shadow hover:opacity-95 transition-opacity"
+      >
         Buscar
       </button>
     </div>
 
-    <div id="loadingOverlay" class="hidden flex justify-center py-8">
-      <div class="text-center">
-        <div class="spinner mx-auto mb-2"></div>
-        <p class="text-gray-600">Buscando agente...</p>
+    <!-- Resultados -->
+    <section id="resultsContainer" class="hidden max-w-4xl mx-auto mt-12 fade-in">
+      <div class="flex justify-between items-center mb-6">
+        <p id="infoText" class="text-sm font-medium text-gray-700"></p>
+        <button id="resetBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Restablecer</button>
       </div>
-    </div>
 
-    <div id="resultsContainer" class="max-w-3xl mx-auto mt-10 hidden fade-in"></div>
+      <div id="loadingOverlay" class="hidden flex justify-center py-8">
+        <div class="text-center">
+          <div class="spinner mx-auto mb-2"></div>
+          <p class="text-gray-600">Buscando resultados...</p>
+        </div>
+      </div>
 
+      <div id="resultsList" class="space-y-6"></div>
+    </section>
+
+    <!-- Mensaje inicial -->
     <div id="welcomeMessage" class="text-center text-gray-500 mt-12 fade-in">
-      <p>Los resultados aparecerán aquí después de buscar un DNI.</p>
+      <p>Los resultados aparecerán aquí después de realizar una búsqueda por DNI.</p>
     </div>
   </main>
 
   <script>
+    // 🔗 URL del CSV publicado desde Google Sheets
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSurBIXBz-zxgpeTzfypry62oOkEvUpRZ-NK7XopbQbCz87sZJFuBUhPTBS17HVxHLuO0kYPe2r3YT0/pub?gid=213572123&single=true&output=csv";
-    let data = [];
+    
+    let allData = [];
     let headers = [];
 
-    const dniInput = document.getElementById("dniInput");
-    const searchBtn = document.getElementById("searchBtn");
     const resultsContainer = document.getElementById("resultsContainer");
     const welcomeMessage = document.getElementById("welcomeMessage");
     const loadingOverlay = document.getElementById("loadingOverlay");
+    const resultsList = document.getElementById("resultsList");
+    const infoText = document.getElementById("infoText");
 
-    async function loadCSV() {
-      const response = await fetch(CSV_URL);
-      const text = await response.text();
-      const parsed = Papa.parse(text, { skipEmptyLines: true });
-      headers = parsed.data[0];
-      data = parsed.data.slice(1);
-    }
-
-    function showMessage(msg, icon = 'info') {
+    function showMessage(msg, icon="info") {
       Swal.fire({
         toast: true,
         position: 'bottom-end',
-        icon,
+        icon: icon,
         title: msg,
         showConfirmButton: false,
         timer: 2000
       });
     }
 
-    function buscarPorDNI(dni) {
-      return data.find(row => row[headers.indexOf("DNI")] === dni);
+    // 🧮 Colorea según desempeño
+    function getColorClass(value) {
+      const num = parseFloat(value);
+      if (isNaN(num)) return "text-gray-500";
+      if (num >= 90) return "text-green-600";
+      if (num >= 75) return "text-yellow-500";
+      return "text-red-500";
     }
 
-    function renderCard(row) {
-      const name = row[headers.indexOf("Agente")] || "Sin nombre";
-      const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
-      const total = row[headers.indexOf("Totalgeneral")] || "—";
+    // 🧩 Renderiza los resultados
+    function renderResults(rows) {
+      resultsList.innerHTML = "";
 
-      const weekCards = semanas.map(s => {
-        const val = row[headers.indexOf(s)] || "—";
-        return `
-          <div class="bg-white border border-gray-200 rounded-lg px-4 py-3 text-center shadow-sm hover:shadow-md transition-all">
-            <div class="text-xs text-gray-500 mb-1">${s}</div>
-            <div class="text-lg font-bold text-blue-700">${val}</div>
+      if (rows.length === 0) {
+        resultsList.innerHTML = `
+          <div class="text-center py-12">
+            <div class="text-gray-400 text-5xl mb-4">📭</div>
+            <p class="text-gray-600">No se encontraron resultados para ese DNI.</p>
           </div>`;
-      }).join("");
+        return;
+      }
 
-      resultsContainer.innerHTML = `
-        <div class="card">
-          <h2 class="text-xl font-bold text-gray-800 mb-4">${name}</h2>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-5">
-            ${weekCards}
-          </div>
-          <div class="pt-3 border-t border-gray-200 text-center">
-            <div class="text-sm text-gray-600">Total General</div>
-            <div class="text-2xl font-bold text-blue-800">${total}</div>
-          </div>
-        </div>`;
+      rows.forEach((row) => {
+        const nombre = row[1] || "Asesor sin nombre"; // Nombre en Col2
+        const notas = row.slice(2, 7); // Notas de calidad (col3 a col7)
+        let totalValue = 0, valid = 0;
+
+        notas.forEach(v => {
+          const num = parseFloat(v);
+          if (!isNaN(num)) { totalValue += num; valid++; }
+        });
+
+        const promedio = valid ? (totalValue / valid).toFixed(1) : "—";
+
+        const notaHTML = notas.map((n, i) => `
+          <div class="p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs text-gray-500 mb-1">Semana ${i + 1}</div>
+            <div class="text-lg font-bold ${getColorClass(n)}">${n || "—"}%</div>
+          </div>`).join("");
+
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-2xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow fade-in";
+        card.innerHTML = `
+          <h2 class="text-xl font-semibold text-blue-800 mb-4">👤 ${nombre}</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">${notaHTML}</div>
+          <div class="mt-6 text-center border-t pt-4">
+            <span class="text-sm text-gray-500 block">Total General</span>
+            <div class="text-3xl font-bold text-indigo-700">${promedio}%</div>
+          </div>`;
+        resultsList.appendChild(card);
+      });
     }
 
-    searchBtn.addEventListener("click", async () => {
-      const dni = dniInput.value.trim();
-      if (!dni) return showMessage("Ingresa un DNI para buscar");
+    // 🔎 Busca por DNI exacto (col1)
+    function searchByDNI(dni) {
+      return allData.filter(row => String(row[0]).trim() === dni);
+    }
+
+    async function loadCSV() {
+      try {
+        const response = await fetch(CSV_URL);
+        const text = await response.text();
+        const parsed = Papa.parse(text, { skipEmptyLines: true });
+        headers = parsed.data[0];
+        allData = parsed.data.slice(1);
+      } catch (err) {
+        showMessage("Error al cargar los datos", "error");
+      }
+    }
+
+    // 🚀 Buscar evento
+    document.getElementById("searchBtn").addEventListener("click", () => {
+      const dni = document.getElementById("searchInput").value.trim();
+      if (!/^\d{8}$/.test(dni)) {
+        showMessage("Por favor ingresa un DNI", "warning");
+        return;
+      }
+
+      if (!allData.length) {
+        showMessage("Cargando datos, intenta de nuevo...", "info");
+        return;
+      }
 
       loadingOverlay.classList.remove("hidden");
-      resultsContainer.classList.add("hidden");
+      resultsContainer.classList.remove("hidden");
       welcomeMessage.classList.add("hidden");
 
       setTimeout(() => {
-        const result = buscarPorDNI(dni);
+        const results = searchByDNI(dni);
+        renderResults(results);
+        infoText.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
         loadingOverlay.classList.add("hidden");
-        if (result) {
-          renderCard(result);
-          resultsContainer.classList.remove("hidden");
-          showMessage("Búsqueda completada ✅", "success");
-        } else {
-          showMessage("No se encontró ningún agente con ese DNI", "warning");
-          resultsContainer.innerHTML = "";
-          resultsContainer.classList.remove("hidden");
-        }
-      }, 500);
+      }, 400);
     });
 
-    dniInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") searchBtn.click();
+    // ⌨️ Enter también busca
+    document.getElementById("searchInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") document.getElementById("searchBtn").click();
     });
 
+    // 🔄 Restablecer
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      document.getElementById("searchInput").value = "";
+      resultsContainer.classList.add("hidden");
+      welcomeMessage.classList.remove("hidden");
+      resultsList.innerHTML = "";
+      infoText.textContent = "";
+      showMessage("Búsqueda restablecida");
+    });
+
+    // Carga inicial
     loadCSV();
   </script>
 </body>
