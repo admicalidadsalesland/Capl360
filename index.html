@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buscador 360 | Capl</title>
+  <title>Buscador CSV | Google Sheets</title>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -29,33 +29,29 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Card Maestra */
-    .master-card {
+    /* Tarjeta individual */
+    .result-card {
       @apply bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6;
     }
 
-    .master-card-title {
-      @apply text-xl font-bold text-gray-800 mb-4;
+    .card-title {
+      @apply text-xl font-bold text-gray-800 mb-3;
     }
 
-    .week-cards {
-      @apply flex flex-wrap gap-4 mb-4;
+    .card-item {
+      @apply flex justify-between py-2 border-b border-gray-100 last:border-b-0;
     }
 
-    .week-card {
-      @apply bg-white border border-gray-200 rounded-lg px-4 py-3 min-w-[140px] text-center;
+    .card-label {
+      @apply text-sm font-medium text-gray-700;
     }
 
-    .week-card-label {
-      @apply text-xs text-gray-500 mb-1;
-    }
-
-    .week-card-value {
-      @apply text-lg font-bold text-blue-700;
+    .card-value {
+      @apply text-sm font-semibold text-gray-900;
     }
 
     .total-section {
-      @apply pt-4 border-t border-gray-200 text-center;
+      @apply pt-3 mt-4 border-t border-gray-200 text-center;
     }
 
     .total-label {
@@ -63,7 +59,7 @@
     }
 
     .total-value {
-      @apply text-2xl font-bold text-blue-800;
+      @apply text-xl font-bold text-blue-800;
     }
   </style>
 </head>
@@ -75,8 +71,8 @@
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold">CSV</div>
         <div>
-          <div class="text-sm font-semibold">Buscador de Agentes</div>
-
+          <div class="text-sm font-semibold">Buscador de Datos</div>
+          <div class="text-xs text-gray-500">Google Sheets</div>
         </div>
       </div>
     </div>
@@ -88,14 +84,14 @@
 
       <!-- Búsqueda -->
       <div class="text-center mb-12 fade-in">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">🔍 Busca en tus registros</h1>
-        <p class="text-gray-600 mb-6">Encuentra información rápidamente en tus datos.</p>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">🔍 Encuentra información rápidamente</h1>
+        <p class="text-gray-600 mb-6">Ingresa un código, nombre o dato clave.</p>
 
         <div class="relative max-w-lg mx-auto">
           <input
             id="searchInput"
             type="text"
-            placeholder="Ej: nombre, código, ciudad..."
+            placeholder="Ej: 7273613"
             class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-800"
           />
           <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</div>
@@ -152,7 +148,7 @@
         .replace(/>/g, ">");
     }
 
-    function renderMasterCards(rows) {
+    function renderResultCards(rows) {
       resultsList.innerHTML = "";
 
       if (rows.length === 0) {
@@ -166,39 +162,41 @@
       }
 
       rows.forEach((row, i) => {
-        // Título principal: primera columna
+        // Título principal: primera columna (ej: 7273613)
         const title = row[0] || `Registro ${i + 1}`;
 
-        // Mini cards para columnas 1 a 5 (semanas)
-        const weekCards = [];
-        for (let j = 1; j <= 5 && j < row.length; j++) {
-          const label = headers[j] || `Semana ${j}`;
+        // Generar lista de campos (etiqueta: valor)
+        const fields = [];
+        for (let j = 0; j < row.length; j++) {
+          const label = headers[j] || `Campo ${j + 1}`;
           const value = row[j] || "—";
-          weekCards.push(`
-            <div class="week-card">
-              <div class="week-card-label">${escapeHtml(label)}</div>
-              <div class="week-card-value">${escapeHtml(value)}</div>
-            </div>
-          `);
+          fields.push({ label, value });
         }
 
-        // Calcular Total General (promedio o suma de las semanas)
+        // Calcular Total General (promedio de valores numéricos)
         let totalValue = 0;
-        let validWeeks = 0;
-        for (let j = 1; j <= 5 && j < row.length; j++) {
+        let validFields = 0;
+        for (let j = 1; j < row.length; j++) { // omitir primera columna (título)
           const val = parseFloat(row[j]);
           if (!isNaN(val)) {
             totalValue += val;
-            validWeeks++;
+            validFields++;
           }
         }
-        const totalGeneral = validWeeks > 0 ? (totalValue / validWeeks).toFixed(1) : "—";
+        const totalGeneral = validFields > 0 ? (totalValue / validFields).toFixed(1) : "—";
 
         const card = document.createElement("div");
-        card.className = "master-card";
+        card.className = "result-card";
         card.innerHTML = `
-          <div class="master-card-title">${escapeHtml(title)}</div>
-          <div class="week-cards">${weekCards.join('')}</div>
+          <div class="card-title">${escapeHtml(title)}</div>
+          <div class="space-y-2">
+            ${fields.map(f => `
+              <div class="card-item">
+                <span class="card-label">${escapeHtml(f.label)}</span>
+                <span class="card-value">${escapeHtml(f.value)}</span>
+              </div>
+            `).join('')}
+          </div>
           <div class="total-section">
             <div class="total-label">Total General</div>
             <div class="total-value">${escapeHtml(totalGeneral)}%</div>
@@ -264,7 +262,7 @@
 
       setTimeout(() => {
         const results = searchCSV(query);
-        renderMasterCards(results);
+        renderResultCards(results);
         infoText.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrados`;
         loadingOverlay.classList.add("hidden");
         showMessage(`Búsqueda completada`);
