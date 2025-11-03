@@ -6,7 +6,7 @@
   <title>Buscador | Notas de Calidad</title>
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Librerías externas -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -16,80 +16,88 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+      background: linear-gradient(135deg, #f0f4ff 0%, #e6edff 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
     }
 
     .spinner {
-      width: 28px;
-      height: 28px;
-      border: 3px solid rgba(148, 163, 184, 0.3);
-      border-top: 3px solid #4f46e5;
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      border-top: 2px solid #4f46e5;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
 
-    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
 
     .ripple {
       position: absolute;
       border-radius: 50%;
       background: rgba(99, 102, 241, 0.2);
       transform: scale(0);
-      animation: ripple 0.6s linear;
+      animation: ripple 0.5s linear;
       pointer-events: none;
     }
-    @keyframes ripple { to { transform: scale(2.5); opacity: 0; } }
-
-    .card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 6px 15px -4px rgba(0,0,0,0.06);
-      padding: 1.5rem;
-      transition: all 0.3s ease;
+    @keyframes ripple {
+      to {
+        transform: scale(2.5);
+        opacity: 0;
+      }
     }
 
     .week-card {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 0.75rem;
       text-align: center;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
     }
 
     .week-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      border-color: #cbd5e1;
     }
-
-    header { height: 64px; }
   </style>
 </head>
-<body class="min-h-screen text-gray-800">
-
-  <!-- 🔝 MENÚ FIJO -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm">
-    <div class="max-w-4xl mx-auto px-5 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">NQ</div>
+<body>
+  <!-- Contenedor principal compacto -->
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+    
+    <!-- Encabezado interno -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-4 text-white">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold text-sm">NQ</div>
         <div>
-          <div class="text-sm font-semibold text-gray-800 leading-tight">Notas de Calidad</div>
-          <div class="text-[11px] text-gray-500 leading-tight">Buscador</div>
+          <div class="font-semibold text-sm">Notas de Calidad</div>
+          <div class="text-xs opacity-90">Buscador de Agentes</div>
         </div>
       </div>
-      <div class="text-[11px] text-gray-400 hidden sm:block">🔍 DNI → Resultados rápidos</div>
     </div>
-  </header>
 
-  <!-- 🌐 CONTENIDO -->
-  <main class="pt-24 pb-16 px-4">
-    <div class="max-w-xl mx-auto text-center fade-in">
-      <h1 class="text-2xl font-bold text-gray-800 mb-2">Buscar agente por DNI</h1>
-      <p class="text-gray-500 mb-6 text-sm">Consulta sus notas semanales y el total general.</p>
+    <!-- Cuerpo -->
+    <div class="px-5 py-6">
+      <h1 class="text-xl font-bold text-gray-800 text-center mb-1">Buscar por DNI</h1>
+      <p class="text-gray-500 text-center text-sm mb-5">Ingresa el DNI del agente para ver sus notas</p>
 
-      <div class="relative max-w-sm mx-auto">
+      <div class="relative mb-4">
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -98,33 +106,33 @@
         <input id="dniInput"
           type="text"
           inputmode="numeric"
-          placeholder="Ingresa DNI"
-          class="w-full pl-9 pr-3 py-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none text-gray-800 text-sm text-center">
+          placeholder="Ej: 38822255"
+          class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-300 focus:border-transparent outline-none text-gray-800 text-sm">
       </div>
 
       <button id="searchBtn"
-        class="mt-4 relative px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg active:scale-95 transition-all duration-200 flex items-center justify-center gap-1 mx-auto text-sm">
+        class="w-full relative px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg shadow hover:shadow-md active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-1.5">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         Buscar
       </button>
-    </div>
 
-    <!-- ⏳ LOADING -->
-    <div id="loadingOverlay" class="hidden flex flex-col items-center justify-center py-10 fade-in">
-      <div class="spinner mb-3"></div>
-      <p class="text-gray-600 text-sm font-medium">Buscando agente…</p>
-    </div>
+      <!-- Loading -->
+      <div id="loadingOverlay" class="hidden flex flex-col items-center justify-center py-6 fade-in">
+        <div class="spinner mb-2"></div>
+        <p class="text-gray-500 text-sm">Buscando agente…</p>
+      </div>
 
-    <!-- 📋 RESULTADOS -->
-    <div id="resultsContainer" class="max-w-2xl mx-auto mt-8 hidden"></div>
+      <!-- Results -->
+      <div id="resultsContainer" class="mt-5 hidden"></div>
 
-    <!-- 💬 MENSAJE INICIAL -->
-    <div id="welcomeMessage" class="text-center text-gray-500 mt-12 fade-in">
-      <p class="text-sm">Introduce un DNI para ver las notas de calidad del agente.</p>
+      <!-- Welcome / Empty State -->
+      <div id="welcomeMessage" class="text-center text-gray-500 mt-6 fade-in">
+        <p class="text-sm">Introduce un DNI para ver las notas del agente.</p>
+      </div>
     </div>
-  </main>
+  </div>
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSurBIXBz-zxgpeTzfypry62oOkEvUpRZ-NK7XopbQbCz87sZJFuBUhPTBS17HVxHLuO0kYPe2r3YT0/pub?gid=213572123&single=true&output=csv";
@@ -137,7 +145,7 @@
     const welcomeMessage = document.getElementById("welcomeMessage");
     const loadingOverlay = document.getElementById("loadingOverlay");
 
-    // 🌊 Ripple effect
+    // Ripple effect
     function createRipple(event) {
       const button = event.currentTarget;
       const circle = document.createElement("span");
@@ -147,8 +155,8 @@
       circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
       circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
       circle.classList.add("ripple");
-      const ripple = button.getElementsByClassName("ripple")[0];
-      if (ripple) ripple.remove();
+      const existing = button.querySelector(".ripple");
+      if (existing) existing.remove();
       button.appendChild(circle);
     }
 
@@ -160,12 +168,7 @@
         headers = parsed.data[0];
         data = parsed.data.slice(1);
       } catch (err) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar los datos',
-          text: 'No se pudieron cargar las notas. Intenta más tarde.',
-          confirmButtonText: 'Entendido'
-        });
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron cargar los datos.', timer: 3000, showConfirmButton: false });
       }
     }
 
@@ -177,7 +180,7 @@
         title: msg,
         showConfirmButton: false,
         timer: 2000,
-        timerProgressBar: true
+        customClass: { popup: 'rounded-lg' }
       });
     }
 
@@ -193,48 +196,53 @@
 
       const weekCards = semanas.map(s => {
         const val = row[headers.indexOf(s)] || "—";
-        const color = val !== "—" && !isNaN(val)
-          ? (val < 85 ? 'text-red-600' : 'text-green-600')
-          : 'text-gray-500';
-        return `
-          <div class="week-card">
-            <div class="text-[11px] text-gray-500 font-medium">${s}</div>
-            <div class="text-lg font-bold mt-1 ${color}">${val}</div>
-          </div>`;
+        const color = val !== "—" && !isNaN(val) ? 
+          (val >= 80 ? 'text-green-600' : val >= 60 ? 'text-yellow-600' : 'text-red-600') : 'text-gray-500';
+        return `<div class="week-card"><div class="text-[10px] text-gray-500">${s}</div><div class="text-sm font-bold mt-0.5 ${color}">${val}</div></div>`;
       }).join("");
 
       resultsContainer.innerHTML = `
-        <div class="card fade-in">
-          <div class="text-center mb-4">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 font-bold text-lg mb-2">
+        <div class="fade-in">
+          <div class="text-center mb-3">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold text-sm mb-1.5">
               ${name.charAt(0).toUpperCase()}
             </div>
-            <h2 class="text-xl font-bold text-gray-800">${name}</h2>
+            <div class="font-semibold text-gray-800 text-sm">${name}</div>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">${weekCards}</div>
-          <div class="pt-3 border-t border-gray-100 text-center">
-            <div class="text-xs text-gray-600 font-medium">Total General</div>
-            <div class="text-2xl font-bold text-indigo-700 mt-1">${total}</div>
+          <div class="grid grid-cols-5 gap-2 mb-3">${weekCards}</div>
+          <div class="pt-2 border-t border-gray-100 text-center">
+            <div class="text-[10px] text-gray-500">Total General</div>
+            <div class="text-lg font-bold text-indigo-700 mt-0.5">${total}</div>
           </div>
         </div>`;
     }
 
     function noResults() {
       resultsContainer.innerHTML = `
-        <div class="card fade-in text-center py-8">
-          <div class="text-red-500 text-4xl mb-2">⚠️</div>
-          <h3 class="text-base font-semibold text-gray-800 mb-1">Agente no encontrado</h3>
-          <p class="text-gray-600 text-sm">Verifica el DNI e inténtalo nuevamente.</p>
+        <div class="text-center py-4 fade-in">
+          <div class="inline-block p-2 rounded-full bg-red-50 mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p class="text-sm text-gray-600">Agente no encontrado</p>
         </div>`;
     }
 
-    searchBtn.addEventListener("click", (event) => {
-      createRipple(event);
-      const dni = dniInput.value.trim();
-      if (!/^\d{7,8}$/.test(dni)) {
-        showMessage("Por favor ingresa un DNI válido", "warning");
+    searchBtn.addEventListener("click", () => {
+      const rawDni = dniInput.value.trim();
+      const dni = rawDni.replace(/\D/g, '');
+
+      if (!dni) {
+        showMessage("Ingresa un DNI", "warning");
         return;
       }
+      if (dni.length < 7 || dni.length > 8) {
+        showMessage("DNI debe tener 7 u 8 dígitos", "warning");
+        return;
+      }
+
+      createRipple(event);
 
       loadingOverlay.classList.remove("hidden");
       resultsContainer.classList.add("hidden");
@@ -246,16 +254,16 @@
         if (result) {
           renderCard(result);
           resultsContainer.classList.remove("hidden");
-          showMessage("✅ Búsqueda completada", "success");
         } else {
           noResults();
           resultsContainer.classList.remove("hidden");
-          showMessage("❌ Agente no encontrado", "error");
         }
-      }, 600);
+      }, 500);
     });
 
-    dniInput.addEventListener("keydown", e => { if (e.key === "Enter") searchBtn.click(); });
+    dniInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") searchBtn.click();
+    });
 
     loadCSV();
   </script>
