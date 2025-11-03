@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buscador CSV | Google Sheets</title>
-  <!-- Corregidos los espacios en las URLs -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -13,67 +12,38 @@
       border: 4px solid #e5e7eb;
       border-top: 4px solid #0ea5e9;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
       animation: spin 1s linear infinite;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
-    /* Estilo para la tabla */
-    #resultsTable th,
-    #resultsTable td {
-      border-bottom: 1px solid #f3f4f6;
-    }
-    #resultsTable th {
-      position: sticky;
-      top: 72px; /* altura del header + padding */
-      background: white;
-      backdrop-filter: blur(4px);
-      z-index: 10;
-    }
-
-    /* Responsive: ajustar tabla en móviles */
-    @media (max-width: 768px) {
-      .search-container {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
-      .search-input-wrapper {
-        width: 100%;
-      }
-      .search-input-wrapper input {
-        width: 100%;
-      }
-    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
   <!-- MENU FIJO -->
   <header class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm z-40">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">CSV</div>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold">CSV</div>
         <div>
           <div class="text-sm font-semibold">Buscador CSV</div>
-          <div class="text-xs text-gray-500">Desde Google Sheets</div>
+          <div class="text-xs text-gray-500">Cargando desde Google Sheets</div>
         </div>
       </div>
-
-      <div class="search-container flex items-center gap-2">
-        <div class="search-input-wrapper relative flex-1 max-w-md">
-          <label for="searchInput" class="sr-only">Buscar en datos</label>
-          <input id="searchInput" type="text" placeholder="Buscar (Enter o lupa)..."
-            class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent" />
-          <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+      <div class="flex-1"></div>
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <input id="searchInput" type="text" placeholder="Buscar (Enter o click en lupa)..."
+            class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 shadow-sm w-96 focus:outline-none focus:ring-2 focus:ring-sky-300" />
+          <div class="absolute left-3 top-1/2 -translate-y-1/2 opacity-80">
             🔍
           </div>
         </div>
         <button id="searchBtn"
-          class="px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 shadow transition-colors flex items-center gap-2 whitespace-nowrap">
+          class="px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 shadow-md flex items-center gap-2">
           🔍 Buscar
         </button>
       </div>
@@ -81,39 +51,34 @@
   </header>
 
   <!-- CONTENIDO -->
-  <main class="pt-28 max-w-6xl mx-auto px-4 pb-12">
+  <main class="pt-24 max-w-6xl mx-auto px-4 pb-12">
     <section class="mb-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-xl font-semibold">Resultados</h1>
-          <p id="infoText" class="text-sm text-gray-600 mt-1">Cargando datos...</p>
+          <h1 class="text-2xl font-semibold">Resultados</h1>
+          <p id="infoText" class="text-sm text-gray-600">Cargando datos...</p>
         </div>
         <div class="text-sm text-gray-500">Fuente: Google Sheets (CSV)</div>
       </div>
     </section>
 
     <section>
-      <div class="relative bg-white rounded-xl shadow overflow-hidden border border-gray-200">
+      <div class="relative bg-white rounded-2xl shadow-sm overflow-hidden">
         <div id="loadingOverlay"
-          class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-30">
-          <div class="text-center">
-            <div class="spinner mx-auto mb-2"></div>
-            <p class="text-gray-600 text-sm">Buscando...</p>
-          </div>
+          class="hidden absolute inset-0 bg-white/70 flex items-center justify-center z-30">
+          <div class="spinner"></div>
         </div>
 
         <div class="overflow-x-auto">
-          <table id="resultsTable" class="w-full table-auto">
-            <thead id="tableHead"></thead>
+          <table id="resultsTable" class="w-full table-auto border-collapse">
+            <thead id="tableHead" class="bg-gradient-to-r from-gray-50 to-white sticky top-0 z-10"></thead>
             <tbody id="tableBody"></tbody>
           </table>
         </div>
 
-        <div class="p-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div class="text-sm text-gray-600">💡 Tip: Usa palabras clave y presiona Enter para buscar rápido.</div>
-          <button id="resetBtn" class="text-sm px-3 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors">
-            Restablecer
-          </button>
+        <div class="p-4 border-t bg-white/60 flex items-center justify-between">
+          <div class="text-sm text-gray-600">Tip: usa palabras clave y presiona Enter para buscar rápido.</div>
+          <button id="resetBtn" class="text-sm px-3 py-2 rounded-lg border">Restablecer</button>
         </div>
       </div>
     </section>
@@ -134,57 +99,36 @@
     }
 
     function renderTable(rows) {
-      // Limpiar tabla
+      // header
       tableHead.innerHTML = "";
-      tableBody.innerHTML = "";
-
-      if (headers.length === 0) return;
-
-      // Renderizar encabezado (máx. 8 columnas + índice + "Más...")
       const headRow = document.createElement("tr");
-      headRow.innerHTML = `
-        <th class="text-left py-3 px-4 text-xs font-medium text-gray-500">#</th>
-        ${headers.slice(0, 8).map(h => `<th class="text-left py-3 px-4 text-xs font-medium text-gray-500">${escapeHtml(h)}</th>`).join('')}
-        <th class="text-left py-3 px-4 text-xs font-medium text-gray-500">Más...</th>
-      `;
+      headRow.innerHTML = `<th class='text-left py-3 px-3 text-xs text-gray-500'>#</th>` +
+        headers.slice(0, 8).map(h => `<th class='text-left py-3 px-3 text-xs text-gray-500'>${h}</th>`).join('') +
+        `<th class='text-left py-3 px-3 text-xs text-gray-500'>Más...</th>`;
       tableHead.appendChild(headRow);
 
-      // Renderizar cuerpo
+      // body
+      tableBody.innerHTML = "";
       if (rows.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="${10}" class="py-10 text-center text-gray-500">No se encontraron resultados.</td>`;
-        tableBody.appendChild(tr);
+        tableBody.innerHTML = `<tr><td colspan="${headers.length + 2}" class="py-12 text-center text-gray-500">No se encontraron resultados.</td></tr>`;
         return;
       }
 
-      rows.forEach((row, i) => {
+      rows.forEach((r, i) => {
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-gray-50 transition-colors";
+        tr.className = "hover:bg-gray-50";
         tr.innerHTML = `
-          <td class="py-3 px-4 text-sm text-gray-600">${i + 1}</td>
-          ${headers.slice(0, 8).map((_, idx) => `<td class="py-3 px-4 text-sm">${escapeHtml(row[idx] || "")}</td>`).join("")}
-          <td class="py-3 px-4 text-sm text-gray-500">${escapeHtml(row.slice(8).filter(Boolean).join(" — "))}</td>
-        `;
+          <td class='py-3 px-3 text-sm text-gray-600'>${i + 1}</td>
+          ${headers.slice(0,8).map((_, idx) => `<td class='py-3 px-3 text-sm'>${r[idx] || ""}</td>`).join("")}
+          <td class='py-3 px-3 text-sm text-gray-500'>${r.slice(8).join(" — ")}</td>`;
         tableBody.appendChild(tr);
       });
-    }
-
-    function escapeHtml(text) {
-      if (typeof text !== 'string') return text || '';
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
     }
 
     function searchCSV(query) {
       const q = query.trim().toLowerCase();
       if (!q) return allData;
-      return allData.filter(row =>
-        row.some(cell => cell && cell.toString().toLowerCase().includes(q))
-      );
+      return allData.filter(r => r.join(" — ").toLowerCase().includes(q));
     }
 
     function showMessage(msg) {
@@ -194,11 +138,7 @@
         icon: 'success',
         title: msg,
         showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        customClass: {
-          popup: 'shadow-lg'
-        }
+        timer: 2500
       });
     }
 
@@ -206,49 +146,32 @@
       showLoading(true);
       try {
         const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const text = await response.text();
         const parsed = Papa.parse(text, { skipEmptyLines: true });
-        if (parsed.data.length === 0) throw new Error("CSV vacío");
-        
-        headers = parsed.data[0].map(h => h || "(Sin nombre)");
-        allData = parsed.data.slice(1).filter(row => row.some(cell => cell)); // eliminar filas vacías
-
+        headers = parsed.data[0];
+        allData = parsed.data.slice(1);
         renderTable(allData);
         infoText.textContent = `${allData.length} filas cargadas · ${allData.length} mostradas`;
       } catch (e) {
-        console.error("Error al cargar CSV:", e);
-        infoText.textContent = "⚠️ Error al cargar los datos. Verifica la URL.";
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudieron cargar los datos desde Google Sheets.',
-          toast: false,
-          position: 'center'
-        });
-      } finally {
-        showLoading(false);
+        infoText.textContent = "Error cargando CSV: " + e;
       }
+      showLoading(false);
     }
 
     // Event Listeners
-    document.getElementById("searchBtn").addEventListener("click", () => {
+    document.getElementById("searchBtn").addEventListener("click", async () => {
       const query = document.getElementById("searchInput").value;
       showLoading(true);
-      setTimeout(() => {
-        const results = searchCSV(query);
-        renderTable(results);
-        infoText.textContent = `${allData.length} filas cargadas · ${results.length} mostradas`;
-        showLoading(false);
-        showMessage(`${results.length} resultado${results.length !== 1 ? 's' : ''}`);
-      }, 300);
+      await new Promise(r => setTimeout(r, 400)); // delay visual
+      const results = searchCSV(query);
+      renderTable(results);
+      infoText.textContent = `${allData.length} filas cargadas · ${results.length} mostradas`;
+      showLoading(false);
+      showMessage(`Búsqueda completada: ${results.length} resultados`);
     });
 
     document.getElementById("searchInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        document.getElementById("searchBtn").click();
-      }
+      if (e.key === "Enter") document.getElementById("searchBtn").click();
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
