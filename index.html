@@ -12,6 +12,8 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
     body {
@@ -25,7 +27,6 @@
       flex-direction: column;
     }
 
-    /* Contenedor principal para centrar y limitar ancho */
     .page-wrapper {
       max-width: 100%;
       width: 100%;
@@ -74,11 +75,8 @@
       animation: spin 1s linear infinite;
     }
 
-    @keyframes spin { 
-      to { transform: rotate(360deg); } 
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* --- HEADER MEJORADO --- */
     header {
       background: rgba(255, 255, 255, 0.92);
       position: fixed;
@@ -125,7 +123,6 @@
       transform: scaleX(1);
     }
 
-    /* Animación para resultados */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -135,32 +132,23 @@
       animation: fadeIn 0.4s ease forwards;
     }
 
-    /* Responsive */
     @media (max-width: 640px) {
-      nav {
-        display: none;
-      }
-
+      nav { display: none; }
       .logo-text span.text-sm { font-size: 0.875rem; }
       .logo-text span.text-xs { font-size: 0.75rem; }
     }
 
-.container-box {
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-
-
-
+    .container-box {
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 
 <body class="min-h-screen text-gray-800">
   <div class="page-wrapper">
-    <!-- MENU FIJO -->
     <header>
       <div class="max-w-6xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -178,10 +166,8 @@
       </div>
     </header>
 
-    <!-- CONTENIDO -->
     <main class="pt-28 pb-16 px-4 sm:px-6">
       <div class="container-box">
-
         <div class="text-center mb-6">
           <h1 class="text-lg font-bold text-gray-800 mb-1">Consulta tus notas de calidad</h1>
           <p class="text-gray-500 text-xs">Busca al agente por su DNI y revisa su desempeño general.</p>
@@ -244,57 +230,72 @@
       return "linear-gradient(to right, #4ade80, #16a34a)";
     }
 
-function renderCard(row) {
-  const name = row[headers.indexOf("Agente")] || "—";
-  const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
-  const totalRaw = parseFloat(row[headers.indexOf("Totalgeneral")]) || 0;
-  const total = totalRaw.toFixed(2);
+    // 🎉 Función de confeti
+    function lanzarConfeti() {
+      const duration = 2000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
 
-  const weekCards = semanas.map(s => {
-    const rawValue = row[headers.indexOf(s)];
-    // Intentamos convertir a número
-    const val = rawValue === '' || rawValue == null ? NaN : parseFloat(rawValue);
-
-    // Si es un número válido (incluye 0), lo mostramos; si no, mostramos "—"
-    if (isNaN(val)) {
-      return `
-        <div class="week-card">
-          <div class="text-[11px] text-gray-500 font-medium">${s}</div>
-          <div class="text-base font-bold mt-1 text-gray-400">—</div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width:0%; background:#e5e7eb"></div>
-          </div>
-        </div>`;
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({ ...defaults, particleCount, origin: { x: 0.5, y: 0.5 } });
+      }, 250);
     }
 
-    // Determinar color según el valor (incluyendo 0)
-    const colorClass =
-      val >= 85 ? "text-green-600" :
-      val >= 70 ? "text-yellow-600" : "text-red-600";
+    function renderCard(row) {
+      const name = row[headers.indexOf("Agente")] || "—";
+      const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
+      const totalRaw = parseFloat(row[headers.indexOf("Totalgeneral")]) || 0;
+      const total = totalRaw.toFixed(2);
 
-    return `
-      <div class="week-card">
-        <div class="text-[11px] text-gray-500 font-medium">${s}</div>
-        <div class="text-base font-bold mt-1 ${colorClass}">${val.toFixed(0)}%</div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width:${Math.min(val,100)}%; background:${getGradientColor(val)}"></div>
-        </div>
-      </div>`;
-  }).join("");
+      const weekCards = semanas.map(s => {
+        const rawValue = row[headers.indexOf(s)];
+        const val = rawValue === '' || rawValue == null ? NaN : parseFloat(rawValue);
 
-  document.getElementById("resultsContainer").innerHTML = `
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center fade-in">
-      <div class="flex flex-col items-center mb-4">
-        <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">${name.charAt(0)}</div>
-        <h2 class="text-lg font-semibold text-gray-800 mt-2">${name}</h2>
-      </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-3">${weekCards}</div>
-      <div class="pt-2 border-t border-gray-100 text-center">
-        <div class="text-[11px] text-gray-600 font-medium">Total General</div>
-        <div class="text-xl font-bold text-indigo-700 mt-1">${total}%</div>
-      </div>
-    </div>`;
-}
+        if (isNaN(val)) {
+          return `
+            <div class="week-card">
+              <div class="text-[11px] text-gray-500 font-medium">${s}</div>
+              <div class="text-base font-bold mt-1 text-gray-400">—</div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:0%; background:#e5e7eb"></div>
+              </div>
+            </div>`;
+        }
+
+        const colorClass =
+          val >= 85 ? "text-green-600" :
+          val >= 70 ? "text-yellow-600" : "text-red-600";
+
+        return `
+          <div class="week-card">
+            <div class="text-[11px] text-gray-500 font-medium">${s}</div>
+            <div class="text-base font-bold mt-1 ${colorClass}">${val.toFixed(0)}%</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${Math.min(val,100)}%; background:${getGradientColor(val)}"></div>
+            </div>
+          </div>`;
+      }).join("");
+
+      document.getElementById("resultsContainer").innerHTML = `
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center fade-in">
+          <div class="flex flex-col items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">${name.charAt(0)}</div>
+            <h2 class="text-lg font-semibold text-gray-800 mt-2">${name}</h2>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-3">${weekCards}</div>
+          <div class="pt-2 border-t border-gray-100 text-center">
+            <div class="text-[11px] text-gray-600 font-medium">Total General</div>
+            <div class="text-xl font-bold text-indigo-700 mt-1">${total}%</div>
+          </div>
+        </div>`;
+
+      // 🎯 Si el total es >= 85, lanzar confeti
+      if (totalRaw >= 85) lanzarConfeti();
+    }
+
     document.getElementById("searchBtn").addEventListener("click", async () => {
       const dni = document.getElementById("dniInput").value.trim();
       if (!dni) return showMessage("Por favor ingresa un DNI válido", "warning");
