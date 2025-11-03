@@ -146,11 +146,12 @@
     }
 
 .container-box {
-  background: linear-gradient(135deg, #2193b0, #6dd5ed, #ffffff);
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
   padding: 2rem;
-  border-radius: 25px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
+
 
 
 
@@ -243,41 +244,57 @@
       return "linear-gradient(to right, #4ade80, #16a34a)";
     }
 
-    function renderCard(row) {
-      const name = row[headers.indexOf("Agente")] || "—";
-      const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
-      const totalRaw = parseFloat(row[headers.indexOf("Totalgeneral")]) || 0;
-      const total = totalRaw.toFixed(2);
+function renderCard(row) {
+  const name = row[headers.indexOf("Agente")] || "—";
+  const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
+  const totalRaw = parseFloat(row[headers.indexOf("Totalgeneral")]) || 0;
+  const total = totalRaw.toFixed(2);
 
-      const weekCards = semanas.map(s => {
-        const val = parseFloat(row[headers.indexOf(s)]) || 0;
-        const colorClass =
-          val >= 85 ? "text-green-600" :
-          val >= 70 ? "text-yellow-600" : "text-red-600";
-        return `
-          <div class="week-card">
-            <div class="text-[11px] text-gray-500 font-medium">${s}</div>
-            <div class="text-base font-bold mt-1 ${colorClass}">${val ? val.toFixed(0) + '%' : '—'}</div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:${Math.min(val,100)}%; background:${getGradientColor(val)}"></div>
-            </div>
-          </div>`;
-      }).join("");
+  const weekCards = semanas.map(s => {
+    const rawValue = row[headers.indexOf(s)];
+    // Intentamos convertir a número
+    const val = rawValue === '' || rawValue == null ? NaN : parseFloat(rawValue);
 
-      document.getElementById("resultsContainer").innerHTML = `
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center fade-in">
-          <div class="flex flex-col items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">${name.charAt(0)}</div>
-            <h2 class="text-lg font-semibold text-gray-800 mt-2">${name}</h2>
-          </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-3">${weekCards}</div>
-          <div class="pt-2 border-t border-gray-100 text-center">
-            <div class="text-[11px] text-gray-600 font-medium">Total General</div>
-            <div class="text-xl font-bold text-indigo-700 mt-1">${total}%</div>
+    // Si es un número válido (incluye 0), lo mostramos; si no, mostramos "—"
+    if (isNaN(val)) {
+      return `
+        <div class="week-card">
+          <div class="text-[11px] text-gray-500 font-medium">${s}</div>
+          <div class="text-base font-bold mt-1 text-gray-400">—</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:0%; background:#e5e7eb"></div>
           </div>
         </div>`;
     }
 
+    // Determinar color según el valor (incluyendo 0)
+    const colorClass =
+      val >= 85 ? "text-green-600" :
+      val >= 70 ? "text-yellow-600" : "text-red-600";
+
+    return `
+      <div class="week-card">
+        <div class="text-[11px] text-gray-500 font-medium">${s}</div>
+        <div class="text-base font-bold mt-1 ${colorClass}">${val.toFixed(0)}%</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${Math.min(val,100)}%; background:${getGradientColor(val)}"></div>
+        </div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("resultsContainer").innerHTML = `
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center fade-in">
+      <div class="flex flex-col items-center mb-4">
+        <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">${name.charAt(0)}</div>
+        <h2 class="text-lg font-semibold text-gray-800 mt-2">${name}</h2>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-3">${weekCards}</div>
+      <div class="pt-2 border-t border-gray-100 text-center">
+        <div class="text-[11px] text-gray-600 font-medium">Total General</div>
+        <div class="text-xl font-bold text-indigo-700 mt-1">${total}%</div>
+      </div>
+    </div>`;
+}
     document.getElementById("searchBtn").addEventListener("click", async () => {
       const dni = document.getElementById("dniInput").value.trim();
       if (!dni) return showMessage("Por favor ingresa un DNI válido", "warning");
