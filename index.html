@@ -41,9 +41,7 @@
       animation: spin 1s linear infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -84,13 +82,11 @@
     }
 
     @keyframes ripple {
-      to {
-        transform: scale(2.5);
-        opacity: 0;
-      }
+      to { transform: scale(2.5); opacity: 0; }
     }
   </style>
 </head>
+
 <body class="min-h-screen text-gray-800">
 
   <!-- MENÚ FIJO -->
@@ -207,41 +203,26 @@
       return data.find(row => row[dniIndex] === dni);
     }
 
-function renderCard(row) {
-  const name = row[headers.indexOf("Agente")] || "—";
-  const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
-  const total = row[headers.indexOf("Totalgeneral")] || "—";
+    function renderCard(row) {
+      const name = row[headers.indexOf("Agente")] || "—";
+      const semanas = ["Semana1","Semana2","Semana3","Semana4","Semana5"];
+      const total = row[headers.indexOf("Totalgeneral")] || "—";
 
-  const weekCards = semanas.map(s => {
-    const val = row[headers.indexOf(s)] || "—";
-    // Aplicar color: verde si >= 85, rojo si < 85 o inválido
-    let colorClass = 'text-gray-500'; // valor por defecto para "—"
-    if (val !== "—" && !isNaN(val)) {
-      const num = parseFloat(val);
-      colorClass = num >= 85 ? 'text-green-600' : 'text-red-600';
-    }
-    return `
-      <div class="week-card">
-        <div class="text-xs text-gray-500 font-medium">${s}</div>
-        <div class="text-lg font-bold mt-1 ${colorClass}">${val}</div>
-      </div>`;
-  }).join("");
-
-  resultsContainer.innerHTML = `
-    <div class="card fade-in">
-      <div class="text-center mb-5">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-100 text-indigo-700 font-bold text-lg mb-2">${name.charAt(0)}</div>
-        <h2 class="text-xl font-semibold text-gray-800">${name}</h2>
-      </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
-        ${weekCards}
-      </div>
-      <div class="pt-3 border-t border-gray-100 text-center">
-        <div class="text-xs text-gray-600 font-medium">Total General</div>
-        <div class="text-2xl font-bold text-indigo-700 mt-1">${total}</div>
-      </div>
-    </div>`;
-}
+      const weekCards = semanas.map(s => {
+        const val = row[headers.indexOf(s)] || "—";
+        const num = parseFloat(val);
+        const color =
+          !isNaN(num)
+            ? num >= 85
+              ? "text-green-600"
+              : "text-red-600"
+            : "text-gray-500";
+        return `
+          <div class="week-card">
+            <div class="text-xs text-gray-500 font-medium">${s}</div>
+            <div class="text-lg font-bold mt-1 ${color}">${val}</div>
+          </div>`;
+      }).join("");
 
       resultsContainer.innerHTML = `
         <div class="card fade-in">
