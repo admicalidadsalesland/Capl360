@@ -2,291 +2,208 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buscador CSV | Google Sheets</title>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web360 | Notas de Calidad</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    .spinner {
-      border: 4px solid #e5e7eb;
-      border-top: 4px solid #3b82f6;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    #sidebar { transition: width 0.2s ease, transform 0.2s ease; }
+    #main-content { transition: margin-left 0.2s ease; }
 
-    .fade-in {
-      animation: fadeIn 0.4s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    #sidebar.mini { width: 4.5rem; }
+    #sidebar.mini .sidebar-text { display: none; }
+    #sidebar.mini .sidebar-header,
+    #sidebar.mini .sidebar-footer { justify-content: center; }
+    #sidebar.mini .nav-item i { margin: 0 auto; display: block; }
 
-    /* Tarjeta individual */
-    .result-card {
-      @apply bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6;
-    }
-
-    .card-title {
-      @apply text-xl font-bold text-gray-800 mb-3;
-    }
-
-    .card-item {
-      @apply flex justify-between py-2 border-b border-gray-100 last:border-b-0;
-    }
-
-    .card-label {
-      @apply text-sm font-medium text-gray-700;
-    }
-
-    .card-value {
-      @apply text-sm font-semibold text-gray-900;
-    }
-
-    .total-section {
-      @apply pt-3 mt-4 border-t border-gray-200 text-center;
-    }
-
-    .total-label {
-      @apply text-sm text-gray-500;
-    }
-
-    .total-value {
-      @apply text-xl font-bold text-blue-800;
+    @media (max-width: 768px) {
+      #sidebar:not(.open) { transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #main-content { margin-left: 0 !important; }
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen text-gray-800 font-sans">
+<body class="bg-gray-100">
 
-  <!-- MENÚ FIJO -->
-  <header class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-40">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold">CSV</div>
-        <div>
-          <div class="text-sm font-semibold">Buscador de Datos</div>
-          <div class="text-xs text-gray-500">Google Sheets</div>
+  <!-- Botón Sidebar -->
+  <button id="toggleSidebar" class="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow w-10 h-10 flex items-center justify-center">
+    <i class="fas fa-bars text-gray-700"></i>
+  </button>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="w-64 h-full fixed z-40 flex flex-col rounded-r-xl shadow-lg 
+  bg-gradient-to-b from-gray-800 via-blue-700 to-cyan-500 text-white transition-all duration-300">
+    <div class="flex items-center gap-3 p-4 border-b border-blue-400/30">
+      <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+        <i class="fas fa-globe text-white"></i>
+      </div>
+      <h1 class="font-extrabold text-lg sidebar-text">Web360</h1>
+    </div>
+
+    <nav class="flex-1 p-3">
+      <h2 class="text-xs font-semibold uppercase tracking-wider text-blue-200 sidebar-text mb-2">Menú</h2>
+      <ul class="space-y-1">
+        <li>
+          <a href="index.html" class="flex items-center p-3 rounded-lg bg-white/20 text-white font-semibold">
+            <i class="fas fa-tachometer-alt w-5 text-center"></i>
+            <span class="ml-3 sidebar-text">Notas de Calidad</span>
+          </a>
+        </li>
+        <li>
+          <a href="Caeq_phx.html" class="flex items-center p-3 rounded-lg hover:bg-white/10">
+            <i class="fas fa-users w-5 text-center"></i>
+            <span class="ml-3 sidebar-text">Caeq PHX</span>
+          </a>
+        </li>
+        <li>
+          <a href="contrato.html" class="flex items-center p-3 rounded-lg hover:bg-white/10">
+            <i class="fas fa-book w-5 text-center"></i>
+            <span class="ml-3 sidebar-text">Lectura Legal</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="p-4 border-t border-blue-400/30">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">360</div>
+        <div class="sidebar-text">
+          <p class="text-sm font-semibold">Desarrollado por:</p>
+          <p class="text-xs text-blue-200">Planeamiento y Métricas</p>
         </div>
       </div>
     </div>
-  </header>
+  </aside>
 
   <!-- CONTENIDO PRINCIPAL -->
-  <main class="pt-28 pb-16 px-4">
-    <div class="max-w-4xl mx-auto">
+  <main id="main-content" class="flex-1 ml-64 pt-20 pb-10 px-4 md:px-6">
+    <div class="max-w-4xl mx-auto text-center mb-8">
+      <h1 class="text-2xl font-bold text-blue-900">🔍 Buscador de Notas de Calidad</h1>
+      <p class="text-gray-600 mt-2">Ingresa el DNI del agente para ver sus notas de calidad</p>
+    </div>
 
-      <!-- Búsqueda -->
-      <div class="text-center mb-12 fade-in">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">🔍 Encuentra información rápidamente</h1>
-        <p class="text-gray-600 mb-6">Ingresa un código, nombre o dato clave.</p>
+    <div class="flex flex-wrap justify-center gap-3 mb-6">
+      <input id="dniInput" type="text" placeholder="Ej: 3882225" autocomplete="off"
+        class="px-4 py-2.5 w-full max-w-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+      <button onclick="buscarPorDNI()" class="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700">
+        Buscar
+      </button>
+    </div>
 
-        <div class="relative max-w-lg mx-auto">
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Ej: 7273613"
-            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-800"
-          />
-          <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</div>
+    <div id="status" class="text-center text-gray-600 italic mb-6">Escribe un DNI y haz clic en Buscar</div>
+
+    <!-- RESULTADO COMO CARD -->
+    <div id="result" class="hidden max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-blue-100 p-8 transition-all duration-300 ease-in-out">
+      <h3 id="agentName" class="text-2xl font-bold text-blue-800 mb-6 border-b border-blue-200 pb-2">Nombre del Agente</h3>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-8">
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center shadow-sm hover:shadow-xl transition">
+          <div class="text-xs text-gray-500 mb-1">Semana 1</div>
+          <div id="s1" class="text-lg font-bold text-blue-900">—</div>
         </div>
-
-        <button
-          id="searchBtn"
-          class="mt-4 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg shadow hover:opacity-95 transition-opacity"
-        >
-          Buscar
-        </button>
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center shadow-sm hover:shadow-xl transition">
+          <div class="text-xs text-gray-500 mb-1">Semana 2</div>
+          <div id="s2" class="text-lg font-bold text-blue-900">—</div>
+        </div>
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center shadow-sm hover:shadow-xl transition">
+          <div class="text-xs text-gray-500 mb-1">Semana 3</div>
+          <div id="s3" class="text-lg font-bold text-blue-900">—</div>
+        </div>
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center shadow-sm hover:shadow-xl transition">
+          <div class="text-xs text-gray-500 mb-1">Semana 4</div>
+          <div id="s4" class="text-lg font-bold text-blue-900">—</div>
+        </div>
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center shadow-sm hover:shadow-xl transition">
+          <div class="text-xs text-gray-500 mb-1">Semana 5</div>
+          <div id="s5" class="text-lg font-bold text-blue-900">—</div>
+        </div>
       </div>
 
-      <!-- Resultados (oculto por defecto) -->
-      <div id="resultsContainer" class="hidden fade-in">
-        <div class="flex justify-between items-center mb-6">
-          <p id="infoText" class="text-sm font-medium text-gray-700"></p>
-          <button id="resetBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Restablecer</button>
+      <!-- Total General -->
+      <div class="text-center mt-4">
+        <div class="text-sm font-semibold text-gray-500">Total General</div>
+        <div id="total" class="text-3xl font-extrabold text-blue-700 mt-2 bg-blue-50 inline-block px-6 py-2 rounded-full shadow">
+          —
         </div>
-
-        <div id="loadingOverlay" class="hidden flex justify-center py-8">
-          <div class="text-center">
-            <div class="spinner mx-auto mb-2"></div>
-            <p class="text-gray-600">Buscando resultados...</p>
-          </div>
-        </div>
-
-        <div id="resultsList" class="space-y-6"></div>
-      </div>
-
-      <!-- Mensaje inicial -->
-      <div id="welcomeMessage" class="text-center text-gray-500 mt-8 fade-in">
-        <p>Los resultados aparecerán aquí después de realizar una búsqueda.</p>
       </div>
     </div>
   </main>
 
   <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSurBIXBz-zxgpeTzfypry62oOkEvUpRZ-NK7XopbQbCz87sZJFuBUhPTBS17HVxHLuO0kYPe2r3YT0/pub?gid=213572123&single=true&output=csv";
-    let allData = [];
-    let headers = [];
+    async function buscarPorDNI() {
+      const dniInput = document.getElementById('dniInput').value.trim();
+      const status = document.getElementById('status');
+      const result = document.getElementById('result');
 
-    const resultsContainer = document.getElementById("resultsContainer");
-    const welcomeMessage = document.getElementById("welcomeMessage");
-    const loadingOverlay = document.getElementById("loadingOverlay");
-    const resultsList = document.getElementById("resultsList");
-    const infoText = document.getElementById("infoText");
-
-    function escapeHtml(text) {
-      if (typeof text !== 'string') return text || '';
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "<")
-        .replace(/>/g, ">");
-    }
-
-    function renderResultCards(rows) {
-      resultsList.innerHTML = "";
-
-      if (rows.length === 0) {
-        resultsList.innerHTML = `
-          <div class="text-center py-12">
-            <div class="text-gray-400 text-5xl mb-4">📭</div>
-            <p class="text-gray-600">No se encontraron resultados.</p>
-          </div>
-        `;
+      if (!dniInput) {
+        status.innerText = 'Por favor, ingresa un DNI.';
+        result.classList.add('hidden');
         return;
       }
 
-      rows.forEach((row, i) => {
-        // Título principal: primera columna (ej: 7273613)
-        const title = row[0] || `Registro ${i + 1}`;
+      status.innerText = 'Buscando...';
+      result.classList.add('hidden');
 
-        // Generar lista de campos (etiqueta: valor)
-        const fields = [];
-        for (let j = 0; j < row.length; j++) {
-          const label = headers[j] || `Campo ${j + 1}`;
-          const value = row[j] || "—";
-          fields.push({ label, value });
-        }
-
-        // Calcular Total General (promedio de valores numéricos)
-        let totalValue = 0;
-        let validFields = 0;
-        for (let j = 1; j < row.length; j++) { // omitir primera columna (título)
-          const val = parseFloat(row[j]);
-          if (!isNaN(val)) {
-            totalValue += val;
-            validFields++;
-          }
-        }
-        const totalGeneral = validFields > 0 ? (totalValue / validFields).toFixed(1) : "—";
-
-        const card = document.createElement("div");
-        card.className = "result-card";
-        card.innerHTML = `
-          <div class="card-title">${escapeHtml(title)}</div>
-          <div class="space-y-2">
-            ${fields.map(f => `
-              <div class="card-item">
-                <span class="card-label">${escapeHtml(f.label)}</span>
-                <span class="card-value">${escapeHtml(f.value)}</span>
-              </div>
-            `).join('')}
-          </div>
-          <div class="total-section">
-            <div class="total-label">Total General</div>
-            <div class="total-value">${escapeHtml(totalGeneral)}%</div>
-          </div>
-        `;
-        resultsList.appendChild(card);
-      });
-    }
-
-    function searchCSV(query) {
-      const q = query.trim().toLowerCase();
-      if (!q) return [];
-      return allData.filter(row =>
-        row.some(cell => cell && cell.toString().toLowerCase().includes(q))
-      );
-    }
-
-    function showMessage(msg) {
-      Swal.fire({
-        toast: true,
-        position: 'bottom-end',
-        icon: 'info',
-        title: msg,
-        showConfirmButton: false,
-        timer: 2000
-      });
-    }
-
-    async function loadCSV() {
       try {
-        const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error("Error al cargar el CSV");
-        const text = await response.text();
-        const parsed = Papa.parse(text, { skipEmptyLines: true });
-        headers = parsed.data[0] || [];
-        allData = parsed.data.slice(1).filter(row => row.some(cell => String(cell).trim()));
-      } catch (e) {
-        console.error("Error:", e);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudieron cargar los datos desde Google Sheets.',
-        });
+        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSurBIXBz-zxgpeTzfypry62oOkEvUpRZ-NK7XopbQbCz87sZJFuBUhPTBS17HVxHLuO0kYPe2r3YT0/pub?gid=187586138&single=true&output=csv');
+        const data = await response.text();
+
+        const rows = data
+          .split('\n')
+          .filter(line => line.trim() !== '')
+          .map(line =>
+            line.split(',').map(cell => cell.trim().replace(/^"(.*)"$/, '$1'))
+          );
+
+        if (rows.length < 2) {
+          status.innerText = 'No se pudieron cargar los datos.';
+          return;
+        }
+
+        const headers = rows[0];
+        const dniIndex = headers.indexOf('DNI');
+
+        if (dniIndex === -1) {
+          status.innerText = 'La columna "DNI" no existe en los datos.';
+          return;
+        }
+
+        const match = rows.slice(1).find(row => row[dniIndex] === dniInput);
+
+        if (match) {
+          document.getElementById('agentName').innerText = match[headers.indexOf('Agente')] || 'Sin Nombre';
+          document.getElementById('s1').innerText = match[headers.indexOf('Semana1')] || '—';
+          document.getElementById('s2').innerText = match[headers.indexOf('Semana2')] || '—';
+          document.getElementById('s3').innerText = match[headers.indexOf('Semana3')] || '—';
+          document.getElementById('s4').innerText = match[headers.indexOf('Semana4')] || '—';
+          document.getElementById('s5').innerText = match[headers.indexOf('Semana5')] || '—';
+          document.getElementById('total').innerText = match[headers.indexOf('Totalgeneral')] || '—';
+
+          result.classList.remove('hidden');
+          status.innerText = 'Resultado encontrado';
+        } else {
+          result.classList.add('hidden');
+          status.innerText = 'No se encontró ningún agente con ese DNI.';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        status.innerText = 'Error al cargar los datos.';
       }
     }
 
-    // Eventos
-    document.getElementById("searchBtn").addEventListener("click", () => {
-      const query = document.getElementById("searchInput").value.trim();
-      if (!query) {
-        showMessage("Escribe algo para buscar");
-        return;
-      }
-
-      if (allData.length === 0) {
-        showMessage("Cargando datos...");
-        return;
-      }
-
-      loadingOverlay.classList.remove("hidden");
-      resultsContainer.classList.remove("hidden");
-      welcomeMessage.classList.add("hidden");
-
-      setTimeout(() => {
-        const results = searchCSV(query);
-        renderResultCards(results);
-        infoText.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrados`;
-        loadingOverlay.classList.add("hidden");
-        showMessage(`Búsqueda completada`);
-      }, 400);
-    });
-
-    document.getElementById("searchInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        document.getElementById("searchBtn").click();
+    // Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    toggleBtn.addEventListener('click', () => {
+      if (window.innerWidth >= 768) {
+        sidebar.classList.toggle('mini');
+        mainContent.classList.toggle('ml-16');
+        mainContent.classList.toggle('ml-64');
+      } else {
+        sidebar.classList.toggle('open');
       }
     });
-
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      document.getElementById("searchInput").value = "";
-      resultsContainer.classList.add("hidden");
-      welcomeMessage.classList.remove("hidden");
-      resultsList.innerHTML = "";
-      infoText.textContent = "";
-      showMessage("Búsqueda restablecida");
-    });
-
-    // Cargar datos en segundo plano
-    loadCSV();
   </script>
 </body>
 </html>
