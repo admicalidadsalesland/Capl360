@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buscador | Notas de Calidad</title>
 
-  <!-- Google Fonts -->
+  <!-- Fuentes y librerías -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -16,41 +14,117 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background: #f8faff;
+      background: linear-gradient(180deg, #f3f4ff 0%, #f9faff 100%);
+      font-size: 0.9rem;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* MENU FIJO */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      z-index: 50;
+      transition: background 0.3s ease;
+    }
+
+    .nav-container {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0.7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(to bottom right, #6366f1, #8b5cf6);
+      border-radius: 10px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
       font-size: 0.9rem;
     }
 
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .logo-text .title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1e1e2f;
+    }
+
+    .logo-text .subtitle {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    nav a {
+      color: #444;
+      font-size: 0.85rem;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(to right, #6366f1, #8b5cf6);
+      transition: width 0.25s ease;
+    }
+
+    nav a:hover {
+      color: #4f46e5;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .menu-toggle {
+      display: none;
+      cursor: pointer;
+    }
+
+    @media (max-width: 640px) {
+      nav {
+        display: none;
+      }
+      .menu-toggle {
+        display: block;
+      }
+    }
+
+    /* CONTENEDOR PRINCIPAL */
     .container-box {
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
       padding: 2rem;
       margin: 0 auto;
-      max-width: 50rem;
-    }
-
-    .week-card {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 0.8rem 0.5rem;
-      text-align: center;
-      font-size: 0.85rem;
-      transition: all 0.2s ease;
-    }
-
-    .progress-bar {
-      height: 5px;
-      border-radius: 3px;
-      margin-top: 6px;
-      background: #e5e7eb;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.6s ease;
+      max-width: 48rem;
     }
 
     .spinner {
@@ -63,47 +137,34 @@
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    header {
-      background: white;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-      backdrop-filter: blur(8px);
-    }
-
-    nav a {
-      color: #555;
-      transition: color 0.2s ease;
-    }
-
-    nav a:hover {
-      color: #4f46e5;
-    }
   </style>
 </head>
 
-<body class="min-h-screen text-gray-800">
+<body class="text-gray-800">
 
-  <!-- MENU FIJO -->
+  <!-- MENU -->
   <header>
-    <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-base">NQ</div>
-        <div>
-          <div class="font-semibold text-gray-800 text-sm">Notas de Calidad</div>
-          <div class="text-xs text-gray-500">Dashboard</div>
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-badge">NQ</div>
+        <div class="logo-text">
+          <span class="title">Notas de Calidad</span>
+          <span class="subtitle">Dashboard</span>
         </div>
       </div>
-      <nav class="hidden sm:flex items-center gap-6 text-sm">
+
+      <nav class="hidden sm:flex items-center gap-6">
         <a href="#">Inicio</a>
         <a href="#">Historial</a>
         <a href="#">Reportes</a>
         <a href="#">Configuración</a>
       </nav>
+
+      <div class="menu-toggle sm:hidden text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </div>
     </div>
   </header>
 
@@ -219,7 +280,7 @@
         const result = buscarPorDNI(dni);
         document.getElementById("loadingOverlay").classList.add("hidden");
         document.getElementById("resultsContainer").classList.remove("hidden");
-        if (result) { renderCard(result); showMessage("✅ Notas de calidad cargados", "success"); }
+        if (result) { renderCard(result); showMessage("✅ Notas de calidad cargadas", "success"); }
         else { showMessage("❌ Agente no encontrado", "error"); }
       }, 700);
     });
