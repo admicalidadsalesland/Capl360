@@ -4,12 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buscador CSV | Google Sheets</title>
-
-  <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
   <style>
     .spinner {
       border: 4px solid #e5e7eb;
@@ -20,25 +17,43 @@
       animation: spin 1s linear infinite;
     }
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .fade-in {
-      animation: fadeIn 0.4s ease-in-out;
+      animation: fadeIn 0.4s ease-out;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Tarjetas modernas */
+    .result-card {
+      @apply bg-white rounded-xl shadow-sm border border-gray-200 p-5 transition-all hover:shadow-md;
+    }
+
+    .card-label {
+      @apply text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1;
+    }
+
+    .card-value {
+      @apply text-sm text-gray-800 mb-2 break-words;
+    }
+
+    .card-more {
+      @apply text-xs text-gray-600 mt-3 pt-3 border-t border-gray-100;
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen text-gray-800 font-sans">
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen text-gray-800 font-sans">
 
-  <!-- MENÚ SUPERIOR -->
-  <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-sm z-40">
+  <!-- MENÚ FIJO -->
+  <header class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-40">
     <div class="max-w-4xl mx-auto px-4 py-3 flex items-center">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">CSV</div>
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold">CSV</div>
         <div>
           <div class="text-sm font-semibold">Buscador de Datos</div>
           <div class="text-xs text-gray-500">Google Sheets</div>
@@ -47,20 +62,20 @@
     </div>
   </header>
 
-  <!-- CONTENIDO -->
+  <!-- CONTENIDO PRINCIPAL -->
   <main class="pt-28 pb-16 px-4">
-    <div class="max-w-4xl mx-auto text-center">
+    <div class="max-w-4xl mx-auto">
 
-      <!-- BUSCADOR -->
-      <div class="mb-10 fade-in">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">🔍 Busca en tus datos</h1>
-        <p class="text-gray-600 mb-6">Ingresa palabras clave para filtrar la información.</p>
+      <!-- Búsqueda -->
+      <div class="text-center mb-12 fade-in">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">🔍 Busca en tus registros</h1>
+        <p class="text-gray-600 mb-6">Encuentra información rápidamente en tus datos.</p>
 
         <div class="relative max-w-lg mx-auto">
           <input
             id="searchInput"
             type="text"
-            placeholder="Escribe algo y presiona Enter..."
+            placeholder="Ej: nombre, código, ciudad..."
             class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-800"
           />
           <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</div>
@@ -68,34 +83,31 @@
 
         <button
           id="searchBtn"
-          class="mt-4 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg shadow hover:opacity-90 transition-opacity"
+          class="mt-4 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg shadow hover:opacity-95 transition-opacity"
         >
           Buscar
         </button>
       </div>
 
-      <!-- RESULTADOS -->
+      <!-- Resultados (oculto por defecto) -->
       <div id="resultsContainer" class="hidden fade-in">
-        <div class="flex justify-between items-center mb-4">
-          <p id="infoText" class="text-sm text-gray-600 font-medium"></p>
+        <div class="flex justify-between items-center mb-6">
+          <p id="infoText" class="text-sm font-medium text-gray-700"></p>
           <button id="resetBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Restablecer</button>
         </div>
 
-        <div class="relative bg-transparent">
-          <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/70 flex items-center justify-center z-10 rounded-lg">
-            <div class="text-center">
-              <div class="spinner mx-auto mb-2"></div>
-              <p class="text-gray-600 text-sm">Buscando...</p>
-            </div>
+        <div id="loadingOverlay" class="hidden flex justify-center py-8">
+          <div class="text-center">
+            <div class="spinner mx-auto mb-2"></div>
+            <p class="text-gray-600">Buscando resultados...</p>
           </div>
-
-          <!-- Tarjetas de resultados -->
-          <div id="cardsContainer" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
         </div>
+
+        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"></div>
       </div>
 
-      <!-- MENSAJE INICIAL -->
-      <div id="welcomeMessage" class="text-gray-500 mt-8">
+      <!-- Mensaje inicial -->
+      <div id="welcomeMessage" class="text-center text-gray-500 mt-8 fade-in">
         <p>Los resultados aparecerán aquí después de realizar una búsqueda.</p>
       </div>
     </div>
@@ -109,50 +121,56 @@
     const resultsContainer = document.getElementById("resultsContainer");
     const welcomeMessage = document.getElementById("welcomeMessage");
     const loadingOverlay = document.getElementById("loadingOverlay");
-    const cardsContainer = document.getElementById("cardsContainer");
+    const resultsGrid = document.getElementById("resultsGrid");
     const infoText = document.getElementById("infoText");
 
-    // Escapar HTML
     function escapeHtml(text) {
       if (typeof text !== 'string') return text || '';
       return text
         .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function showLoading(show) {
-      loadingOverlay.classList.toggle("hidden", !show);
+        .replace(/</g, "<")
+        .replace(/>/g, ">");
     }
 
     function renderCards(rows) {
-      cardsContainer.innerHTML = "";
+      resultsGrid.innerHTML = "";
 
       if (rows.length === 0) {
-        cardsContainer.innerHTML = `<p class="col-span-full text-gray-500 text-center py-10">No se encontraron resultados.</p>`;
+        resultsGrid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <div class="text-gray-400 text-5xl mb-4">📭</div>
+            <p class="text-gray-600">No se encontraron resultados.</p>
+          </div>
+        `;
         return;
       }
 
-      rows.forEach((row, index) => {
+      rows.forEach((row, i) => {
+        // Campos principales (primeras 8 columnas)
+        const mainFields = headers.slice(0, 8).map((header, idx) => {
+          const value = row[idx] || "—";
+          return `
+            <div>
+              <div class="card-label">${escapeHtml(header)}</div>
+              <div class="card-value">${escapeHtml(value)}</div>
+            </div>
+          `;
+        }).join('');
+
+        // Detalles adicionales (columnas 9+)
+        const extraValues = row.slice(8).filter(v => v && v.toString().trim());
+        const moreInfo = extraValues.length > 0
+          ? `<div class="card-more">Más: ${escapeHtml(extraValues.join(" • "))}</div>`
+          : '';
+
         const card = document.createElement("div");
-        card.className = "bg-white rounded-xl shadow-md p-4 text-left border border-gray-100 hover:shadow-lg transition transform hover:-translate-y-1";
-        
-        const mainFields = headers.slice(0, 4).map((h, i) => {
-          const value = escapeHtml(row[i] || "—");
-          return `<p class="text-sm"><span class="font-semibold text-gray-700">${h}:</span> ${value}</p>`;
-        }).join("");
-
-        const extras = row.slice(4).filter(Boolean).join(" · ");
-        
+        card.className = "result-card";
         card.innerHTML = `
-          <div class="mb-2 flex justify-between items-center">
-            <span class="text-xs text-gray-400 font-medium">#${index + 1}</span>
-          </div>
-          <div class="space-y-1">${mainFields}</div>
-          ${extras ? `<p class="mt-3 text-xs text-gray-500">${escapeHtml(extras)}</p>` : ""}
+          <div class="text-xs text-gray-400 mb-2">#${i + 1}</div>
+          <div class="space-y-2">${mainFields}</div>
+          ${moreInfo}
         `;
-
-        cardsContainer.appendChild(card);
+        resultsGrid.appendChild(card);
       });
     }
 
@@ -171,8 +189,7 @@
         icon: 'info',
         title: msg,
         showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true
+        timer: 2000
       });
     }
 
@@ -189,32 +206,35 @@
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'No se pudieron cargar los datos. Verifica la URL del CSV.',
-          confirmButtonText: 'OK'
+          text: 'No se pudieron cargar los datos desde Google Sheets.',
         });
       }
     }
 
     // Eventos
     document.getElementById("searchBtn").addEventListener("click", () => {
-      const query = document.getElementById("searchInput").value;
-      if (!allData.length) {
+      const query = document.getElementById("searchInput").value.trim();
+      if (!query) {
+        showMessage("Escribe algo para buscar");
+        return;
+      }
+
+      if (allData.length === 0) {
         showMessage("Cargando datos...");
         return;
       }
 
-      showLoading(true);
+      loadingOverlay.classList.remove("hidden");
+      resultsContainer.classList.remove("hidden");
+      welcomeMessage.classList.add("hidden");
+
       setTimeout(() => {
         const results = searchCSV(query);
         renderCards(results);
         infoText.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrados`;
-
-        welcomeMessage.classList.add("hidden");
-        resultsContainer.classList.remove("hidden");
-
-        showLoading(false);
+        loadingOverlay.classList.add("hidden");
         showMessage(`Búsqueda completada`);
-      }, 300);
+      }, 400);
     });
 
     document.getElementById("searchInput").addEventListener("keydown", e => {
@@ -228,10 +248,12 @@
       document.getElementById("searchInput").value = "";
       resultsContainer.classList.add("hidden");
       welcomeMessage.classList.remove("hidden");
+      resultsGrid.innerHTML = "";
+      infoText.textContent = "";
       showMessage("Búsqueda restablecida");
     });
 
-    // Carga inicial
+    // Cargar datos en segundo plano
     loadCSV();
   </script>
 </body>
