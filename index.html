@@ -1,620 +1,646 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SBK360 | Notas</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SBK360 | Notas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-:root {
-  --primary-red: #ef4444;
-  --primary-dark: #b91c1c;
-  --bg-gradient: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
-  --card-bg: #ffffff;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --shadow-soft: 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-menu: 0 8px 24px rgba(239,68,68,0.3);
-  --menu-height: 70px;
-}
+  <style>
+    :root {
+      --primary-red: #ef4444;
+      --primary-dark: #b91c1c;
+      --bg-gradient: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --shadow-soft: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-menu: 0 8px 24px rgba(239,68,68,0.3);
+      --menu-height: 70px;
+    }
 
-/* RESET */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg-gradient);
-  color: var(--text-main);
-  overflow-x: hidden;
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
 
-/* MENU CON GRADIENTE ANIMADO */
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: var(--menu-height);
-  background: linear-gradient(270deg, #f87171, #dc2626, #f87171);
-  background-size: 600% 600%;
-  animation: gradientMove 10s ease infinite;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  box-shadow: var(--shadow-menu);
-  z-index: 1000;
-  border-bottom: 2px solid #fff5f5;
-  transition: all 0.3s ease;
-}
-header:hover { transform: none; box-shadow: var(--shadow-menu); }
-header .logo {
-  font-weight: 700;
-  font-size: 1.7rem;
-  color: #fff;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
-}
-header nav a {
-  margin-left: 28px;
-  text-decoration: none;
-  color: #fff;
-  font-weight: 500;
-  position: relative;
-  padding: 6px 0;
-  transition: all 0.3s ease;
-}
-header nav a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  width: 0;
-  height: 3px;
-  background-color: #fff;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-  transform: translateX(-50%);
-}
-header nav a:hover { transform: translateY(-3px) scale(1.08); }
-header nav a:hover::after { width: 100%; }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--menu-height);
+      background: linear-gradient(270deg, #f87171, #dc2626, #f87171);
+      background-size: 600% 600%;
+      animation: gradientMove 10s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      box-shadow: var(--shadow-menu);
+      z-index: 1000;
+      border-bottom: 2px solid #fff5f5;
+      transition: all 0.3s ease;
+    }
+    header .logo {
+      font-weight: 700;
+      font-size: 1.7rem;
+      color: #fff;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    }
+    header nav a {
+      margin-left: 28px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      padding: 6px 0;
+      transition: all 0.3s ease;
+    }
+    header nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background-color: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    header nav a:hover { transform: translateY(-3px) scale(1.08); }
+    header nav a:hover::after { width: 100%; }
 
-/* MAIN */
-main {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  padding: calc(var(--menu-height) + 40px) 40px 40px 40px;
-  transition: all 0.3s ease;
-}
+    main {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding: calc(var(--menu-height) + 40px) 40px 40px 40px;
+      transition: all 0.3s ease;
+    }
 
-/* PANELS */
-.left-panel, .right-panel {
-  background: var(--card-bg);
-  border-radius: 20px;
-  box-shadow: var(--shadow-soft);
-  padding: 20px;
-  min-height: 500px;
-  flex: 1;
-  max-width: 50%;
-}
+    .left-panel, .right-panel {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      padding: 20px;
+      min-height: 500px;
+      flex: 1;
+      max-width: 50%;
+    }
 
-/* TITULOS */
-h1 { font-size: 1.6rem; margin-bottom: 14px; color: #334155; display: flex; align-items: center; gap: 6px; }
-h1::before { content: "📊"; }
-h3 { font-size: 1rem; color: #475569; margin-bottom: 10px; }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 14px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    h1::before { content: "📊"; }
+    h3 {
+      font-size: 1rem;
+      color: #475569;
+      margin-bottom: 10px;
+    }
 
-/* BUSCADOR */
-.search-box { display: flex; gap: 10px; margin-bottom: 14px; }
-.search-box input {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: 2px solid #f87171;
-  font-size: 13px;
-}
-.search-box input:focus {
-  border-color: var(--primary-red);
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(239,68,68,0.25);
-}
-.search-box button {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: linear-gradient(270deg, #f87171, #dc2626, #f87171);
-  background-size: 600% 600%;
-  animation: gradientMove 6s ease infinite;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid #f87171;
+      font-size: 13px;
+    }
+    .search-box input:focus {
+      border-color: var(--primary-red);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.25);
+    }
+    .search-box button {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(270deg, #f87171, #dc2626, #f87171);
+      background-size: 600% 600%;
+      animation: gradientMove 6s ease infinite;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-/* TABLAS COMPACTAS */
-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 10px; }
-th {
-  background: #fee2e2;
-  color: var(--text-main);
-  font-weight: 600;
-  border-bottom: 1px solid #fca5a5;
-  text-align: center;
-  padding: 4px 6px;
-}
-td {
-  border-bottom: 1px solid #fef2f2;
-  text-align: center;
-  color: #0f172a;
-  padding: 2px 4px;
-  position: relative;
-}
-td:first-child { text-align: left; font-weight: 500; }
-tbody tr:nth-child(even) { background: #fff5f5; }
-tbody tr:hover { background: #fee2e2; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 10px;
+    }
+    th {
+      background: #fee2e2;
+      color: var(--text-main);
+      font-weight: 600;
+      border-bottom: 1px solid #fca5a5;
+      text-align: center;
+      padding: 4px 6px;
+    }
+    td {
+      border-bottom: 1px solid #fef2f2;
+      text-align: center;
+      color: #0f172a;
+      padding: 2px 4px;
+      position: relative;
+    }
+    td:first-child { text-align: left; font-weight: 500; }
+    tbody tr:nth-child(even) { background: #fff5f5; }
+    tbody tr:hover { background: #fee2e2; }
 
-/* TOOLTIP CON MINI BARRA */
-td[data-tooltip]:hover::after {
-  content: '';
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 8px;
-  background: linear-gradient(to right, #16a34a var(--bar-width,0%), #d1d5db var(--bar-width,0%));
-  border-radius: 4px;
-  white-space: nowrap;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-td[data-tooltip]:hover::before {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 140%;
-  left: 50%;
-  transform: translateX(-50%) scale(1);
-  background: #1e293b;
-  color: white;
-  font-size: 9px;
-  padding: 2px 5px;
-  border-radius: 4px;
-  white-space: nowrap;
-  z-index: 11;
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-td[data-tooltip]:hover::after,
-td[data-tooltip]:hover::before {
-  opacity: 1;
-  transform: translateX(-50%) scale(1.05);
-}
+    td[data-tooltip]:hover::after {
+      content: '';
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 8px;
+      background: linear-gradient(to right, #16a34a var(--bar-width,0%), #d1d5db var(--bar-width,0%));
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    td[data-tooltip]:hover::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 140%;
+      left: 50%;
+      transform: translateX(-50%) scale(1);
+      background: #1e293b;
+      color: white;
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 11;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    td[data-tooltip]:hover::after,
+    td[data-tooltip]:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) scale(1.05);
+    }
 
-/* DIVIDER */
-.divider { border-top: 2px solid #fca5a5; margin: 16px 0; }
+    .divider { border-top: 2px solid #fca5a5; margin: 16px 0; }
 
-/* GRAFICO ANILLO */
-.chart-container { position: relative; width: 160px; height: 160px; margin: 16px auto; }
-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-.circle-bg { fill: none; stroke: #d1d5db; stroke-width: 12; }
-.circle-progress {
-  fill: none;
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-dasharray: 565.48;
-  stroke-dashoffset: 565.48;
-  transition: stroke 0.25s ease;
-}
-.percentage {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #111827;
-}
-.subtitle { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 4px; }
+    .chart-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 16px auto;
+    }
+    svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .circle-bg {
+      fill: none;
+      stroke: #d1d5db;
+      stroke-width: 12;
+    }
+    .circle-progress {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 565.48;
+      stroke-dashoffset: 565.48;
+      transition: stroke 0.25s ease;
+    }
+    .percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #111827;
+    }
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
 
-/* ESTADOS */
-.c-bad { color: #b91c1c !important; font-weight: 600; }
-.c-warn { color: #f97316 !important; font-weight: 600; }
-.c-good { color: #16a34a !important; font-weight: 600; }
-.cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 4px; }
-.cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 4px; }
+    .c-bad { color: #b91c1c !important; font-weight: 600; }
+    .c-warn { color: #f97316 !important; font-weight: 600; }
+    .c-good { color: #16a34a !important; font-weight: 600; }
+    .cell-error {
+      background: #fee2e2;
+      color: #b91c1c;
+      font-weight: 600;
+      border-radius: 4px;
+    }
+    .cell-ok {
+      background: #dcfce7;
+      color: #16a34a;
+      font-weight: 600;
+      border-radius: 4px;
+    }
 
-/* MENSAJE DE ESTADO */
-.status-message {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: white;
-  border: 1px solid #f87171;
-  border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 6px 12px rgba(239,68,68,0.25);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: #16a34a;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.4s ease;
-  z-index: 9999;
-}
-.status-message.show { opacity: 1; transform: translateY(0); }
-.status-message .check-icon { font-size: 1.2rem; color: #16a34a; }
+    .status-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #f87171;
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 6px 12px rgba(239,68,68,0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #16a34a;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease;
+      z-index: 9999;
+    }
+    .status-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .status-message .check-icon {
+      font-size: 1.2rem;
+      color: #16a34a;
+    }
 
-/* MENSAJE DINÁMICO CENTRAL (CELEBRACIÓN) */
-#celebration-message {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  font-size: 2rem;
-  font-weight: 700;
-  color: #f43f5e;
-  text-align: center;
-  text-shadow: 0 2px 10px rgba(244, 63, 94, 0.3);
-  z-index: 9997;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.6s ease;
-  font-family: 'Inter', sans-serif;
-  white-space: nowrap;
-}
-#celebration-message.show {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-  color: #16a34a;
-  text-shadow: 0 0 20px rgba(22, 163, 74, 0.5);
-}
+    #celebration-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f43f5e;
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(244, 63, 94, 0.3);
+      z-index: 9997;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.6s ease;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+    #celebration-message.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      color: #16a34a;
+      text-shadow: 0 0 20px rgba(22, 163, 74, 0.5);
+    }
 
-/* SUGERENCIA DE MEJORA */
-.suggestion-box {
-  margin-top: 16px;
-  padding: 12px;
-  background: #fef3c7;
-  border-left: 4px solid #f59e0b;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  color: #78350f;
-}
+    .suggestion-box {
+      margin-top: 16px;
+      padding: 12px;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #78350f;
+    }
 
-/* TENDENCIA */
-.trend-indicator {
-  display: inline-block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-left: 8px;
-  padding: 2px 6px;
-  border-radius: 12px;
-}
-.trend-up { color: #16a34a; background: #dcfce7; }
-.trend-down { color: #b91c1c; background: #fee2e2; }
-.trend-flat { color: #64748b; background: #f1f5f9; }
+    .trend-indicator {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 8px;
+      padding: 2px 6px;
+      border-radius: 12px;
+    }
+    .trend-up { color: #16a34a; background: #dcfce7; }
+    .trend-down { color: #b91c1c; background: #fee2e2; }
+    .trend-flat { color: #64748b; background: #f1f5f9; }
 
-/* LOADER */
-.loader {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #ef4444;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
-  margin: 16px auto;
-}
-@keyframes spin { 100% { transform: rotate(360deg); } }
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ef4444;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 16px auto;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  main { flex-direction: column; padding: calc(var(--menu-height) + 20px) 16px 16px 16px; }
-  .left-panel, .right-panel { max-width: 100%; }
-}
+    @media (max-width: 900px) {
+      main {
+        flex-direction: column;
+        padding: calc(var(--menu-height) + 20px) 16px 16px 16px;
+      }
+      .left-panel, .right-panel {
+        max-width: 100%;
+      }
+    }
 
-/* ESTILO CONFETI */
-#confetti-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9996;
-}
-</style>
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9996;
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="logo">SBKTC360</div>
-  <nav>
-    <a href="#">Inicio</a>
-    <a href="#">Evaluaciones</a>
-    <a href="#">Reportes</a>
-    <a href="#">Configuración</a>
-  </nav>
-</header>
+  <header>
+    <div class="logo">SBKTC360</div>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Evaluaciones</a>
+      <a href="#">Reportes</a>
+      <a href="#">Configuración</a>
+    </nav>
+  </header>
 
-<main>
-  <div class="left-panel">
-    <h1>Consulta tus notas de calidad</h1>
-    <div class="search-box">
-      <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" />
-      <button id="btnSearch">🔍 Buscar</button>
-    </div>
-    <div id="resultContainer"><div class="info">🔍 Ingresa un DNI para ver los resultados</div></div>
-  </div>
-
-  <div class="right-panel">
-    <h3>⚠️ Seguimiento por semana</h3>
-    <div id="errorContainer"><div class="info">Esperando datos...</div></div>
-  </div>
-</main>
-
-<div id="statusMessage" class="status-message">
-  <span class="check-icon">✅</span>
-  <span>Notas de calidad cargadas</span>
-</div>
-
-<!-- CANVAS PARA CONFETI -->
-<canvas id="confetti-canvas"></canvas>
-
-<!-- MENSAJE DINÁMICO CENTRAL -->
-<div id="celebration-message">¡Felicidades!</div>
-
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-<script>
-// URLs de tu Apps Script (reemplaza con tu URL real)
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-7BcZms1lQXRnlnA0GiNyDcZ8ob7su0tljLF00Hn8WCsYufG2tQofNRpXwjGy2ETf/exec";
-
-// Mapeo de bloques principales (deben coincidir con los nombres en tu hoja y en el Apps Script)
-const COLUMNS = [
-  { key: "C_1 Sondeo y levantamiento de información", label: "Sondeo y levantamiento" },
-  { key: "C_2 Claridad en el ofrecimiento", label: "Claridad en ofrecimiento" },
-  { key: "C_3 Regulado y protocolo", label: "Regulado y protocolo" },
-  { key: "C_4 Induce a la baja", label: "Induce a la baja" },
-  { key: "C_5 Facturación", label: "Facturación" },
-  { key: "C_6 Recordatorio de bono", label: "Recordatorio de bono" },
-  { key: "NOTA", label: "Nota General" }
-];
-
-// Columnas de detalle (deben coincidir EXACTAMENTE con los encabezados de tu hoja "Notas")
-const DETAIL_COLUMNS = [
-  "1.1 Solicita consentimiento para informar ofertas y nuevas promociones",
-  "1.2 Valida titularidad de cliente en abordaje",
-  "1.3 Aborda con argumento de necesidad de gb (según base y speech)",
-  "1.4 Información total de gb del plan a ofrecer (plan más detalle de bono incluido el tiempo)",
-  "2.1 Ofrece plan según oferta base",
-  "2.2 Informa correctamente 3 beneficios del plan a ofrecer",
-  "2.3 Para base de clientes con alto consumo de gb (90-100) o con consumo mayor a lo que brinda su plan actual (100% a más) según base: Lo utiliza como argumento para explicarle al cliente que necesita un CAPL",
-  "2.4 Para base de cliente con consumo medio y bajo de gb de su plan, según base: se le crea la necesidad de contar con más gb de internet",
-  "2.5 Para clientes con planes ilimitados, según base: indica si el cliente navegó a baja velocidad por lo que agotó sus gb del plan y amerita un capl",
-  "2.6 Indica al cliente, según base, los 2 aplicativos que más utiliza (indirectamente según speech)",
-  "2.7 Rebate las objeciones del cliente",
-  "2.8 Efectúa el sondeo de necesidades del cliente (2 veces en rebate)",
-  "2.9 Informa claramente cuándo se hará efectivo el CAPL",
-  "2.10 Primer rebate: identifica la necesidad del cliente como argumento para capl",
-  "2.11 Efectúa el sondeo de necesidades del cliente (específicamente en rebate)",
-  "3.1 Solicita y valida correctamente los datos del titular",
-  "3.2 No modifica u omite palabras de la lectura del contrato",
-  "3.3 Solicita consentimiento de tratamiento de información",
-  "4.1 No utiliza la baja a futuro como argumento de venta",
-  "5.1 Explica correctamente al cliente según su ciclo de facturación, desde cuándo se activan los beneficios, en qué recibo comenzará a pagar el nuevo cargo fijo",
-  "6.1 Refuerza en la despedida, el bono, tiempo y forma de canjear en el app Mi Movistar"
-];
-
-// UTILS (igual que antes)
-function parseToPercent(val) {
-  if (val == null || val === "") return null;
-  let n = Number(val);
-  if (isNaN(n)) return null;
-  return Math.min(100, Math.max(0, n));
-}
-
-function getColorClass(value) {
-  if (value <= 65) return 'c-bad';
-  if (value >= 85) return 'c-good';
-  return 'c-warn';
-}
-
-function calcAvg(values) {
-  const nums = values.filter(v => v !== null);
-  return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
-}
-
-function showStatusMessage(msg = "Notas cargadas") {
-  const status = document.getElementById('statusMessage');
-  status.querySelector('span:nth-child(2)').textContent = msg;
-  status.classList.add('show');
-  setTimeout(() => status.classList.remove('show'), 5000);
-}
-
-// DONUT (igual)
-function animateDonut(targetPercent) {
-  const circle = document.querySelector('.circle-progress');
-  const text = document.getElementById('percentValue');
-  const radius = 90;
-  const circumference = 2 * Math.PI * radius;
-  circle.style.strokeDasharray = circumference;
-  let current = 0;
-  function step() {
-    current += (targetPercent - current) * 0.1;
-    if (Math.abs(current - targetPercent) < 0.1) current = targetPercent;
-    const offset = circumference - (current / 100) * circumference;
-    circle.style.strokeDashoffset = offset;
-    let color = "#facc15";
-    if (current <= 65) color = "#f43f5e";
-    else if (current >= 85) color = "#2AC793";
-    circle.style.stroke = color;
-    text.style.color = color;
-    text.textContent = current.toFixed(1) + '%';
-    if (current < targetPercent) requestAnimationFrame(step);
-    else {
-      if (targetPercent >= 85) {
-        launchConfetti();
-        showCelebrationMessage(targetPercent);
-      }
-      circle.style.boxShadow = targetPercent >= 90 ? '0 0 20px rgba(22, 163, 74, 0.6)' : 'none';
-    }
-  }
-  requestAnimationFrame(step);
-}
-
-// NUEVA FUNCIÓN: buscar usando tu API de Apps Script
-async function searchByDNI() {
-  const dniInput = document.getElementById('dniInput');
-  const dni = dniInput.value.trim();
-
-  if (!dni) {
-    alert("Por favor ingresa un DNI");
-    return;
-  }
-
-  const resultContainer = document.getElementById('resultContainer');
-  const errorContainer = document.getElementById('errorContainer');
-
-  // Mostrar loader
-  resultContainer.innerHTML = '<div class="loader"></div>';
-  errorContainer.innerHTML = '<div class="loader"></div>';
-
-  try {
-    const response = await fetch(`${APPS_SCRIPT_URL}?api=metricas&dni=${dni}`);
-    const data = await response.json();
-
-    if (data.error) {
-      resultContainer.innerHTML = `<div class="error">⚠️ ${data.error}</div>`;
-      errorContainer.innerHTML = "";
-      return;
-    }
-
-    if (data.total === 0) {
-      resultContainer.innerHTML = `<div class="error">No se encontraron evaluaciones para el DNI ${dni}</div>`;
-      errorContainer.innerHTML = "";
-      return;
-    }
-
-    const nombre = data.registros[0]?.AGENTE || "Sin nombre";
-    const semanas = [...new Set(data.registros.map(r => r[headers.indexOf("SEMANA")] || 'Sin semana'))].sort();
-
-    // Reconstruir headers desde el primer registro (asumiendo que todos tienen misma estructura)
-    // Pero como la API devuelve registros completos, necesitamos los índices
-    // → Mejor: mapear registros a objetos usando headers (lo hacemos una vez)
-    const headers = Object.keys(data.registros[0].constructor.prototype).length > 0 ? 
-      // No podemos obtener headers de array de arrays fácilmente → solución: asumir orden fijo (igual que en Apps Script)
-      // En su lugar, usamos que sabemos los nombres → mapeamos por índice en COLUMNS y DETAIL_COLUMNS
-      null : null;
-
-    // Tabla izquierda: bloques principales
-    let leftTable = `<h3>Resultados para: ${nombre}`;
-    const notaGlobal = data.promedios["NOTA"] || 0;
-    if (notaGlobal >= 85) {
-      leftTable += `<span style="display: inline-block; background: #fbbf24; color: #1e293b; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 600;">🌟 Excelente</span>`;
-    }
-    leftTable += `</h3><table><thead><tr><th>Bloques</th>${semanas.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-
-    // Calcular promedio por semana para cada bloque
-    COLUMNS.forEach(col => {
-      leftTable += `<tr><td>${col.label}</td>`;
-      semanas.forEach(semana => {
-        const values = data.registros
-          .filter(r => (r[headers.indexOf("SEMANA")] || 'Sin semana') === semana)
-          .map(r => {
-            const colIndex = headers.indexOf(col.key);
-            return colIndex !== -1 ? parseToPercent(r[colIndex]) : null;
-          })
-          .filter(v => v !== null);
-        const avg = calcAvg(values);
-        const cls = getColorClass(avg);
-        leftTable += `<td class="${cls}" data-tooltip="${avg.toFixed(1)}%" style="--bar-width:${avg}%">${avg.toFixed(1)}%</td>`;
-      });
-      leftTable += '</tr>';
-    });
-    leftTable += '</tbody></table><div class="divider"></div>';
-    leftTable += `
-      <div class="chart-container">
-        <svg viewBox="0 0 200 200">
-          <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-          <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
-        </svg>
-        <div class="percentage" id="percentValue">0%</div>
+  <main>
+    <div class="left-panel">
+      <h1>Consulta tus notas de calidad</h1>
+      <div class="search-box">
+        <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" />
+        <button id="btnSearch">🔍 Buscar</button>
       </div>
-      <div class="subtitle">(%) Nota General | (Evaluaciones: ${data.total})</div>
-    `;
+      <div id="resultContainer"><div class="info">🔍 Ingresa un DNI para ver los resultados</div></div>
+    </div>
 
-    if (notaGlobal < 85) {
-      const worstBlock = COLUMNS.slice(0, -1).reduce((worst, col) => {
-        const avg = data.promedios[col.key] || 0;
-        return avg < worst.avg ? { key: col.label, avg } : worst;
-      }, { key: '', avg: 100 });
+    <div class="right-panel">
+      <h3>⚠️ Seguimiento por semana</h3>
+      <div id="errorContainer"><div class="info">Esperando datos...</div></div>
+    </div>
+  </main>
 
-      leftTable += `
-        <div class="suggestion-box">
-          💡 <strong>Sugerencia:</strong> Tu bloque a mejorar es <strong>${worstBlock.key}</strong> (${worstBlock.avg.toFixed(1)}%). 
-          Recuerda: mejorar aquí puede elevar tu nota general en hasta 15%.
-        </div>
-      `;
+  <div id="statusMessage" class="status-message">
+    <span class="check-icon">✅</span>
+    <span>Notas de calidad cargadas</span>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+  <div id="celebration-message">¡Felicidades!</div>
+
+  <script>
+    // ✅ URL CORREGIDA (sin espacios)
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-7BcZms1lQXRnlnA0GiNyDcZ8ob7su0tljLF00Hn8WCsYufG2tQofNRpXwjGy2ETf/exec";
+
+    const COLUMNS = [
+      { key: "C_1 Sondeo y levantamiento de información", label: "Sondeo y levantamiento" },
+      { key: "C_2 Claridad en el ofrecimiento", label: "Claridad en ofrecimiento" },
+      { key: "C_3 Regulado y protocolo", label: "Regulado y protocolo" },
+      { key: "C_4 Induce a la baja", label: "Induce a la baja" },
+      { key: "C_5 Facturación", label: "Facturación" },
+      { key: "C_6 Recordatorio de bono", label: "Recordatorio de bono" },
+      { key: "NOTA", label: "Nota General" }
+    ];
+
+    const DETAIL_COLUMNS = [
+      "1.1 Solicita consentimiento para informar ofertas y nuevas promociones",
+      "1.2 Valida titularidad de cliente en abordaje",
+      "1.3 Aborda con argumento de necesidad de gb (según base y speech)",
+      "1.4 Información total de gb del plan a ofrecer (plan más detalle de bono incluido el tiempo)",
+      "2.1 Ofrece plan según oferta base",
+      "2.2 Informa correctamente 3 beneficios del plan a ofrecer",
+      "2.3 Para base de clientes con alto consumo de gb (90-100) o con consumo mayor a lo que brinda su plan actual (100% a más) según base: Lo utiliza como argumento para explicarle al cliente que necesita un CAPL",
+      "2.4 Para base de cliente con consumo medio y bajo de gb de su plan, según base: se le crea la necesidad de contar con más gb de internet",
+      "2.5 Para clientes con planes ilimitados, según base: indica si el cliente navegó a baja velocidad por lo que agotó sus gb del plan y amerita un capl",
+      "2.6 Indica al cliente, según base, los 2 aplicativos que más utiliza (indirectamente según speech)",
+      "2.7 Rebate las objeciones del cliente",
+      "2.8 Efectúa el sondeo de necesidades del cliente (2 veces en rebate)",
+      "2.9 Informa claramente cuándo se hará efectivo el CAPL",
+      "2.10 Primer rebate: identifica la necesidad del cliente como argumento para capl",
+      "2.11 Efectúa el sondeo de necesidades del cliente (específicamente en rebate)",
+      "3.1 Solicita y valida correctamente los datos del titular",
+      "3.2 No modifica u omite palabras de la lectura del contrato",
+      "3.3 Solicita consentimiento de tratamiento de información",
+      "4.1 No utiliza la baja a futuro como argumento de venta",
+      "5.1 Explica correctamente al cliente según su ciclo de facturación, desde cuándo se activan los beneficios, en qué recibo comenzará a pagar el nuevo cargo fijo",
+      "6.1 Refuerza en la despedida, el bono, tiempo y forma de canjear en el app Mi Movistar"
+    ];
+
+    // Confeti (sin cambios)
+    function initConfetti() {
+      window.confettiCanvas = document.getElementById('confetti-canvas');
+      window.confettiCtx = confettiCanvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+    }
+    function resizeCanvas() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    class ConfettiPiece {
+      constructor() {
+        this.x = Math.random() * confettiCanvas.width;
+        this.y = -20;
+        this.width = Math.random() * 10 + 5;
+        this.height = Math.random() * 8 + 3;
+        this.speed = Math.random() * 3 + 2;
+        this.color = ['#f44336','#e91e63','#9c27b0','#673ab7','#3f51b5','#2196f3','#03a9f4','#00bcd4','#009688','#4caf50','#8bc34a','#cddc39','#ffeb3b','#ffc107','#ff9800','#ff5722'][Math.floor(Math.random()*16)];
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 5 - 2.5;
+      }
+      update() { this.y += this.speed; this.rotation += this.rotationSpeed; }
+      draw() {
+        confettiCtx.save();
+        confettiCtx.translate(this.x, this.y);
+        confettiCtx.rotate(this.rotation * Math.PI / 180);
+        confettiCtx.fillStyle = this.color;
+        confettiCtx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+        confettiCtx.restore();
+      }
+    }
+    function launchConfetti() {
+      const pieces = [];
+      for (let i = 0; i < 150; i++) pieces.push(new ConfettiPiece());
+      (function animate() {
+        confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+        let active = pieces.filter(p => { p.update(); p.draw(); return p.y < confettiCanvas.height; });
+        if (active.length) requestAnimationFrame(animate);
+      })();
+    }
+    function showCelebrationMessage(nota) {
+      const el = document.getElementById('celebration-message');
+      if (nota >= 85) {
+        el.textContent = nota >= 95 ? "¡Eres un referente en calidad!" : "¡Felicidades! ¡Tu desempeño es excelente!";
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 5000);
+      }
     }
 
-    resultContainer.innerHTML = leftTable;
-    animateDonut(notaGlobal);
+    // Utils
+    const parseToPercent = val => {
+      if (val == null || val === "") return null;
+      const n = Number(val);
+      return isNaN(n) ? null : Math.min(100, Math.max(0, n));
+    };
+    const getColorClass = v => v <= 65 ? 'c-bad' : v >= 85 ? 'c-good' : 'c-warn';
+    const calcAvg = vals => {
+      const nums = vals.filter(v => v !== null);
+      return nums.length ? nums.reduce((a,b) => a + b, 0) / nums.length : 0;
+    };
+    const showStatusMessage = (msg = "Notas cargadas") => {
+      const el = document.getElementById('statusMessage');
+      el.querySelector('span:nth-child(2)').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 5000);
+    };
 
-    // Tabla derecha: detalle (errores = valor < 1 o no cumple)
-    let rightTable = `<table><thead><tr><th>Atributos</th>${semanas.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-    DETAIL_COLUMNS.forEach(colName => {
-      // Acortar label para mostrar
-      const shortLabel = colName.split(' ').slice(0, 5).join(' ') + (colName.split(' ').length > 5 ? '...' : '');
-      rightTable += `<tr><td title="${colName}">${shortLabel}</td>`;
-      semanas.forEach(semana => {
-        const values = data.registros
-          .filter(r => (r[headers.indexOf("SEMANA")] || 'Sin semana') === semana)
-          .map(r => {
-            const idx = headers.indexOf(colName);
-            return idx !== -1 ? Number(r[idx]) || 0 : 0;
+    // Donut
+    function animateDonut(target) {
+      const circle = document.querySelector('.circle-progress');
+      const text = document.getElementById('percentValue');
+      const radius = 90;
+      const circ = 2 * Math.PI * radius;
+      circle.style.strokeDasharray = circ;
+      let current = 0;
+      (function step() {
+        current += (target - current) * 0.1;
+        if (Math.abs(current - target) < 0.1) current = target;
+        circle.style.strokeDashoffset = circ - (current/100)*circ;
+        const color = current <= 65 ? "#f43f5e" : current >= 85 ? "#2AC793" : "#facc15";
+        circle.style.stroke = color;
+        text.style.color = color;
+        text.textContent = current.toFixed(1) + '%';
+        if (current < target) requestAnimationFrame(step);
+        else {
+          if (current >= 85) { launchConfetti(); showCelebrationMessage(current); }
+          circle.style.boxShadow = current >= 90 ? '0 0 20px rgba(22, 163, 74, 0.6)' : 'none';
+        }
+      })();
+    }
+
+    // 🔑 BUSCAR POR DNI (CORREGIDO)
+    async function searchByDNI() {
+      const dni = document.getElementById('dniInput').value.trim();
+      if (!dni) return alert("Ingresa un DNI");
+
+      const resultContainer = document.getElementById('resultContainer');
+      const errorContainer = document.getElementById('errorContainer');
+      resultContainer.innerHTML = '<div class="loader"></div>';
+      errorContainer.innerHTML = '<div class="loader"></div>';
+
+      try {
+        const res = await fetch(`${APPS_SCRIPT_URL}?api=metricas&dni=${dni}`);
+        const data = await res.json();
+
+        if (data.error) throw new Error(data.error);
+        if (data.total === 0) throw new Error(`No se encontraron evaluaciones para el DNI ${dni}`);
+
+        const { headers, registros, promedios, total } = data;
+        const agenteIdx = headers.indexOf("AGENTE");
+        const semanaIdx = headers.indexOf("SEMANA");
+        const nombre = registros[0]?.[agenteIdx] || "Sin nombre";
+        const semanas = [...new Set(registros.map(r => r[semanaIdx] || 'Sin semana'))].sort();
+
+        // --- Panel izquierdo ---
+        let left = `<h3>Resultados para: ${nombre}`;
+        const notaGlobal = promedios["NOTA"] || 0;
+        if (notaGlobal >= 85) {
+          left += `<span style="display:inline-block;background:#fbbf24;color:#1e293b;font-size:0.7rem;padding:2px 8px;border-radius:12px;margin-left:8px;font-weight:600;">🌟 Excelente</span>`;
+        }
+        left += `</h3><table><thead><tr><th>Bloques</th>${semanas.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+
+        COLUMNS.forEach(col => {
+          const colIdx = headers.indexOf(col.key);
+          left += `<tr><td>${col.label}</td>`;
+          semanas.forEach(w => {
+            const vals = registros
+              .filter(r => (r[semanaIdx] || 'Sin semana') === w)
+              .map(r => colIdx !== -1 ? parseToPercent(r[colIdx]) : null)
+              .filter(v => v !== null);
+            const avg = calcAvg(vals);
+            left += `<td class="${getColorClass(avg)}" data-tooltip="${avg.toFixed(1)}%" style="--bar-width:${avg}%">${avg.toFixed(1)}%</td>`;
           });
-        const sum = values.reduce((a, b) => a + b, 0);
-        // Suponemos: 1 = OK, 0 = ERROR (ajusta si es al revés)
-        const isError = sum < values.length; // si no todos son 1
-        rightTable += `<td class="${isError ? 'cell-error' : 'cell-ok'}" data-tooltip="${sum}/${values.length}">${isError ? '❌' : '✅'}</td>`;
-      });
-      rightTable += '</tr>';
+          left += '</tr>';
+        });
+        left += `</tbody></table><div class="divider"></div>
+          <div class="chart-container">
+            <svg viewBox="0 0 200 200">
+              <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+              <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+            </svg>
+            <div class="percentage" id="percentValue">0%</div>
+          </div>
+          <div class="subtitle">(%) Nota General | (Evaluaciones: ${total})</div>`;
+
+        if (notaGlobal < 85) {
+          const worst = COLUMNS.slice(0, -1).reduce((w, col) => {
+            const avg = promedios[col.key] || 0;
+            return avg < w.avg ? { key: col.label, avg } : w;
+          }, { key: '', avg: 100 });
+          left += `<div class="suggestion-box">💡 <strong>Sugerencia:</strong> Tu bloque a mejorar es <strong>${worst.key}</strong> (${worst.avg.toFixed(1)}%). Recuerda: mejorar aquí puede elevar tu nota general en hasta 15%.</div>`;
+        }
+
+        resultContainer.innerHTML = left;
+        animateDonut(notaGlobal);
+
+        // --- Panel derecho (detalle) ---
+        let right = `<table><thead><tr><th>Atributos</th>${semanas.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+        DETAIL_COLUMNS.forEach(colName => {
+          const short = colName.split(' ').slice(0, 4).join(' ') + (colName.split(' ').length > 4 ? '...' : '');
+          const idx = headers.indexOf(colName);
+          right += `<tr><td title="${colName}">${short}</td>`;
+          semanas.forEach(w => {
+            const vals = registros
+              .filter(r => (r[semanaIdx] || 'Sin semana') === w)
+              .map(r => idx !== -1 ? (Number(r[idx]) || 0) : 0);
+            const ok = vals.filter(v => v >= 1).length;
+            const isError = ok < vals.length;
+            right += `<td class="${isError ? 'cell-error' : 'cell-ok'}" data-tooltip="${ok}/${vals.length}">${isError ? '❌' : '✅'}</td>`;
+          });
+          right += '</tr>';
+        });
+        right += '</tbody></table>';
+        errorContainer.innerHTML = right;
+
+        showStatusMessage(`Resultados para DNI ${dni} cargados`);
+
+      } catch (err) {
+        resultContainer.innerHTML = `<div class="error">⚠️ ${err.message}</div>`;
+        errorContainer.innerHTML = "";
+        console.error(err);
+      }
+    }
+
+    document.getElementById('btnSearch').addEventListener('click', searchByDNI);
+    document.getElementById('dniInput').addEventListener('keyup', e => {
+      if (e.key === 'Enter') searchByDNI();
     });
-    rightTable += '</tbody></table>';
-    errorContainer.innerHTML = rightTable;
 
-    showStatusMessage(`Resultados para DNI ${dni} cargados`);
-
-  } catch (err) {
-    console.error(err);
-    resultContainer.innerHTML = `<div class="error">❌ Error al cargar datos: ${err.message || 'Verifica tu conexión'}</div>`;
-    errorContainer.innerHTML = "";
-  }
-}
-
-// Event listeners
-document.getElementById('btnSearch').addEventListener('click', searchByDNI);
-document.getElementById('dniInput').addEventListener('keyup', e => {
-  if (e.key === 'Enter') searchByDNI();
-});
-
-// Inicializar confeti (sin CSV)
-window.onload = () => {
-  initConfetti();
-  // No cargamos CSV, todo viene de la API
-};
-</script>
-
-  
+    window.onload = () => {
+      initConfetti();
+    };
+  </script>
 </body>
 </html>
