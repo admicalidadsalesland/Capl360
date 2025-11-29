@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SBK360 | Notas</title>
+<title>CAPL360 | Notas</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -312,7 +312,7 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 
 <body>
 <header>
-  <div class="logo">SBKTC360</div>
+  <div class="logo">CAPL360</div>
   <nav>
     <a href="#">Inicio</a>
     <a href="#">Evaluaciones</a>
@@ -347,10 +347,8 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
-// 🔥 NUEVO ENLACE CSV
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT77CaeayP6AwFoZl5EvFOFeI7IOMd6ewmJPDU9TEmCGmy0GJiaaoJ9kl7T85ttEc81uO7wQu5bgAb8/pub?gid=1199818084&single=true&output=csv";
 
-// Definiciones de bloques principales (para la tabla izquierda)
 const COLUMNS = [
   { key: 'C_1 Sondeo y levantamiento de información', label: 'Sondeo y levantamiento' },
   { key: 'C_2 Claridad en el ofrecimiento', label: 'Claridad en ofrecimiento' },
@@ -361,7 +359,6 @@ const COLUMNS = [
   { key: 'NOTA', label: 'Nota General' }
 ];
 
-// Definiciones de detalle (para la tabla derecha)
 const DETAIL_COLUMNS = [
   { key: '1.1 Solicita consentimiento para informar ofertas y nuevas promociones', label: 'Solicita consentimiento para ofertas' },
   { key: '1.2 Valida titularidad de cliente en abordaje', label: 'Valida titularidad' },
@@ -506,6 +503,7 @@ function showStatusMessage(msg = "Notas de calidad cargadas") {
   setTimeout(()=> status.classList.remove('show'), 5000);
 }
 
+// 🔥 NUEVO: forzar DNI como string al cargar
 function loadData() {
   return new Promise((resolve)=>{
     const container = document.getElementById('resultContainer');
@@ -513,6 +511,13 @@ function loadData() {
     Papa.parse(CSV_URL, {
       download: true,
       header: true,
+      transform: function(value, field) {
+        // Forzar DNI a cadena para evitar pérdida de precisión
+        if (field === 'DNI') {
+          return String(value).trim();
+        }
+        return value;
+      },
       complete: function(results) {
         allData = results.data;
         container.innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
@@ -534,7 +539,6 @@ function animateDonut(targetPercent) {
   const radius = 90;
   const circumference = 2 * Math.PI * radius;
   circle.style.strokeDasharray = circumference;
-  let offset = circumference;
   let current = 0;
   function step() {
     current += (targetPercent - current) * 0.1;
@@ -563,20 +567,24 @@ function animateDonut(targetPercent) {
   requestAnimationFrame(step);
 }
 
+// 🔥 NUEVO: comparar DNI como texto exacto
 async function searchByDNI() {
-  const dni = document.getElementById('dniInput').value.trim();
-  if(!dni) return alert("Ingresa un DNI");
+  const dniInput = document.getElementById('dniInput').value.trim();
+  if(!dniInput) return alert("Ingresa un DNI");
   if(!allData.length) await loadData();
-  const filtered = allData.filter(r=>r.DNI && r.DNI.toString().includes(dni));
+
+  // Buscar coincidencia EXACTA en DNI (como texto)
+  const filtered = allData.filter(r => r.DNI === dniInput);
+
   if(!filtered.length){
-    document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
+    document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dniInput}</div>`;
     document.getElementById('errorContainer').innerHTML = "";
     return;
   }
+
   const nombre = filtered[0]?.AGENTE || "Sin nombre";
   const weeks = [...new Set(filtered.map(r=>r.SEMANA||'Sin semana'))].sort();
 
-  // TABLA IZQUIERDA
   let table = `<h3>Resultados para: ${nombre}`;
   const notaGlobal = calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
   if (notaGlobal >= 85) {
@@ -647,7 +655,6 @@ async function searchByDNI() {
   document.getElementById('resultContainer').innerHTML = table;
   animateDonut(notaGlobal);
 
-  // TABLA DERECHA DETALLE
   let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
   DETAIL_COLUMNS.forEach(col=>{
     detail+=`<tr><td>${col.label}</td>`;
