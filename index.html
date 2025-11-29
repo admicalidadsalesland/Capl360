@@ -3,69 +3,631 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prueba CSV Simple</title>
+  <title>SBK360 | Notas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #f0f0f0; }
-    .error { color: red; font-weight: bold; }
-    .loader { color: #d32f2f; }
-  </style>
-</head>
-<body>
-
-<h2>🔬 Prueba de carga de CSV</h2>
-<p>URL: <code>const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT77CaeayP6AwFoZl5EvFOFeI7IOMd6ewmJPDU9TEmCGmy0GJiaaoJ9kl7T85ttEc81uO7wQu5bgAb8/pub?gid=1199818084&single=true&output=tsv"</code></p>
-
-<div id="status" class="loader">Cargando datos...</div>
-<div id="output"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT77CaeayP6AwFoZl5EvFOFeI7IOMd6ewmJPDU9TEmCGmy0GJiaaoJ9kl7T85ttEc81uO7wQu5bgAb8/pub?gid=1199818084&single=true&output=csv";
-
-Papa.parse(CSV_URL, {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-  complete: function(results) {
-    const data = results.data.filter(row => row.DNI); // solo filas con DNI
-    const status = document.getElementById('status');
-    const output = document.getElementById('output');
-    
-    if (data.length === 0) {
-      status.className = 'error';
-      status.textContent = "❌ No se cargaron datos (hoja vacía o no publicada)";
-      return;
+    :root {
+      --primary-red: #ef4444;
+      --primary-dark: #b91c1c;
+      --bg-gradient: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --shadow-soft: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-menu: 0 8px 24px rgba(239,68,68,0.3);
+      --menu-height: 70px;
     }
 
-    status.className = '';
-    status.textContent = `✅ Cargadas ${data.length} filas. Mostrando primeras 5:`
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
 
-    // Crear tabla simple
-    let html = `<table><thead><tr>`;
-    const headers = Object.keys(data[0]);
-    headers.forEach(h => html += `<th>${h}</th>`);
-    html += `</tr></thead><tbody>`;
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-    data.slice(0, 5).forEach(row => {
-      html += `<tr>`;
-      headers.forEach(h => {
-        html += `<td>${row[h] || ''}</td>`;
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--menu-height);
+      background: linear-gradient(270deg, #f87171, #dc2626, #f87171);
+      background-size: 600% 600%;
+      animation: gradientMove 10s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      box-shadow: var(--shadow-menu);
+      z-index: 1000;
+      border-bottom: 2px solid #fff5f5;
+      transition: all 0.3s ease;
+    }
+    header .logo {
+      font-weight: 700;
+      font-size: 1.7rem;
+      color: #fff;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    }
+    header nav a {
+      margin-left: 28px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      padding: 6px 0;
+      transition: all 0.3s ease;
+    }
+    header nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background-color: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    header nav a:hover { transform: translateY(-3px) scale(1.08); }
+    header nav a:hover::after { width: 100%; }
+
+    main {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding: calc(var(--menu-height) + 40px) 40px 40px 40px;
+      transition: all 0.3s ease;
+    }
+
+    .left-panel, .right-panel {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      padding: 20px;
+      min-height: 500px;
+      flex: 1;
+      max-width: 50%;
+    }
+
+    h1 { font-size: 1.6rem; margin-bottom: 14px; color: #334155; display: flex; align-items: center; gap: 6px; }
+    h1::before { content: "📊"; }
+    h3 { font-size: 1rem; color: #475569; margin-bottom: 10px; }
+
+    .search-box { display: flex; gap: 10px; margin-bottom: 14px; }
+    .search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid #f87171;
+      font-size: 13px;
+    }
+    .search-box input:focus {
+      border-color: var(--primary-red);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.25);
+    }
+    .search-box button {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(270deg, #f87171, #dc2626, #f87171);
+      background-size: 600% 600%;
+      animation: gradientMove 6s ease infinite;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 10px; }
+    th {
+      background: #fee2e2;
+      color: var(--text-main);
+      font-weight: 600;
+      border-bottom: 1px solid #fca5a5;
+      text-align: center;
+      padding: 4px 6px;
+    }
+    td {
+      border-bottom: 1px solid #fef2f2;
+      text-align: center;
+      color: #0f172a;
+      padding: 2px 4px;
+      position: relative;
+    }
+    td:first-child { text-align: left; font-weight: 500; }
+    tbody tr:nth-child(even) { background: #fff5f5; }
+    tbody tr:hover { background: #fee2e2; }
+
+    td[data-tooltip]:hover::after {
+      content: '';
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 8px;
+      background: linear-gradient(to right, #16a34a var(--bar-width,0%), #d1d5db var(--bar-width,0%));
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    td[data-tooltip]:hover::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 140%;
+      left: 50%;
+      transform: translateX(-50%) scale(1);
+      background: #1e293b;
+      color: white;
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 11;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    td[data-tooltip]:hover::after,
+    td[data-tooltip]:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    .divider { border-top: 2px solid #fca5a5; margin: 16px 0; }
+
+    .chart-container { position: relative; width: 160px; height: 160px; margin: 16px auto; }
+    svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .circle-bg { fill: none; stroke: #d1d5db; stroke-width: 12; }
+    .circle-progress {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 565.48;
+      stroke-dashoffset: 565.48;
+      transition: stroke 0.25s ease;
+    }
+    .percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #111827;
+    }
+    .subtitle { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 4px; }
+
+    .c-bad { color: #b91c1c !important; font-weight: 600; }
+    .c-warn { color: #f97316 !important; font-weight: 600; }
+    .c-good { color: #16a34a !important; font-weight: 600; }
+    .cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 4px; }
+    .cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 4px; }
+
+    .status-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #f87171;
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 6px 12px rgba(239,68,68,0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #16a34a;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease;
+      z-index: 9999;
+    }
+    .status-message.show { opacity: 1; transform: translateY(0); }
+    .status-message .check-icon { font-size: 1.2rem; color: #16a34a; }
+
+    #celebration-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f43f5e;
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(244, 63, 94, 0.3);
+      z-index: 9997;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.6s ease;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+    #celebration-message.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      color: #16a34a;
+      text-shadow: 0 0 20px rgba(22, 163, 74, 0.5);
+    }
+
+    .suggestion-box {
+      margin-top: 16px;
+      padding: 12px;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #78350f;
+    }
+
+    .trend-indicator {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 8px;
+      padding: 2px 6px;
+      border-radius: 12px;
+    }
+    .trend-up { color: #16a34a; background: #dcfce7; }
+    .trend-down { color: #b91c1c; background: #fee2e2; }
+    .trend-flat { color: #64748b; background: #f1f5f9; }
+
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ef4444;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 16px auto;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .info, .error { padding: 12px; text-align: center; color: var(--text-muted); }
+    .error { color: #b91c1c; }
+
+    @media (max-width: 900px) {
+      main { flex-direction: column; padding: calc(var(--menu-height) + 20px) 16px 16px 16px; }
+      .left-panel, .right-panel { max-width: 100%; }
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9996;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">SBKTC360</div>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Evaluaciones</a>
+      <a href="#">Reportes</a>
+      <a href="#">Configuración</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="left-panel">
+      <h1>Consulta tus notas de calidad</h1>
+      <div class="search-box">
+        <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" />
+        <button id="btnSearch">🔍 Buscar</button>
+      </div>
+      <div id="resultContainer">
+        <div class="info">🔍 Ingresa un DNI para ver los resultados</div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <h3>⚠️ Seguimiento por semana</h3>
+      <div id="errorContainer">
+        <div class="info">Esperando datos...</div>
+      </div>
+    </div>
+  </main>
+
+  <div id="statusMessage" class="status-message">
+    <span class="check-icon">✅</span>
+    <span>Notas de calidad cargadas</span>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+  <div id="celebration-message">¡Felicidades!</div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // 🔑 CONFIGURACIÓN — ¡REEMPLAZA ESTO CON TUS DATOS REALES!
+    const SUPABASE_URL = "https://sylucvtlscfcerqqtrpy.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bHVjdnRsc2NmY2VycXF0cnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODQ2NTYsImV4cCI6MjA3ODM2MDY1Nn0.opybqq7PK-GMYWFrJbSdCOenmpkkbMFO-K3u5ahQUWY";
+
+    // Inicializar Supabase
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Columnas según tu tabla
+    const COLUMNS = [
+      { key: 'c_1', label: 'Sondeo y levantamiento de inf.' },
+      { key: 'c_2', label: 'Claridad en el ofrecimiento' },
+      { key: 'c_3', label: 'Regulado y protocolo' },
+      { key: 'c_4', label: 'Induce a la baja' },
+      { key: 'c_5', label: 'Facturación' },
+      { key: 'c_6', label: 'Recordatorio de bono' },
+      { key: 'nota', label: 'Nota General' }
+    ];
+
+    const DETAIL_COLUMNS = Array.from({ length: 21 }, (_, i) => ({
+      key: `item_${i + 1}`,
+      label: `Ítem ${i + 1}`
+    }));
+
+    let allData = [];
+    let confettiCanvas, confettiCtx;
+    let confettiPieces = [];
+    const confettiColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+
+    // === UTILS ===
+    function parseToPercent(raw) {
+      if (raw == null || raw === '') return null;
+      let n = parseFloat(raw);
+      if (isNaN(n)) return null;
+      if (n <= 1) n *= 100;
+      return Math.min(100, Math.max(0, n));
+    }
+
+    function getColorClass(value) {
+      if (value <= 65) return 'c-bad';
+      if (value >= 85) return 'c-good';
+      return 'c-warn';
+    }
+
+    function calcAvg(values) {
+      const nums = values.filter(v => v !== null && !isNaN(v));
+      return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+    }
+
+    function showStatusMessage(msg = "Notas de calidad cargadas") {
+      const status = document.getElementById('statusMessage');
+      status.querySelector('span:nth-child(2)').textContent = msg;
+      status.classList.add('show');
+      setTimeout(() => status.classList.remove('show'), 5000);
+    }
+
+    // === CONFETI ===
+    function initConfetti() {
+      confettiCanvas = document.getElementById('confetti-canvas');
+      confettiCtx = confettiCanvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+    }
+
+    function resizeCanvas() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+
+    class ConfettiPiece {
+      constructor() {
+        this.x = Math.random() * confettiCanvas.width;
+        this.y = -20;
+        this.width = Math.random() * 10 + 5;
+        this.height = Math.random() * 8 + 3;
+        this.speed = Math.random() * 3 + 2;
+        this.color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 5 - 2.5;
+      }
+      update() {
+        this.y += this.speed;
+        this.rotation += this.rotationSpeed;
+      }
+      draw() {
+        confettiCtx.save();
+        confettiCtx.translate(this.x, this.y);
+        confettiCtx.rotate(this.rotation * Math.PI / 180);
+        confettiCtx.fillStyle = this.color;
+        confettiCtx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        confettiCtx.restore();
+      }
+    }
+
+    function launchConfetti() {
+      confettiPieces = [];
+      for (let i = 0; i < 150; i++) {
+        confettiPieces.push(new ConfettiPiece());
+      }
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      let active = confettiPieces.filter(p => p.y < confettiCanvas.height).length;
+      confettiPieces.forEach(p => { p.update(); p.draw(); });
+      if (active > 0) requestAnimationFrame(animateConfetti);
+    }
+
+    function showCelebrationMessage(nota) {
+      if (nota < 85) return;
+      const el = document.getElementById('celebration-message');
+      el.textContent = nota >= 95 ? "¡Excelente! ¡Eres un referente en calidad!" :
+                        nota >= 90 ? "¡Impresionante! ¡Tu desempeño es excepcional!" :
+                        "¡Felicidades! ¡Lograste una nota sobresaliente!";
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    // === DONUT CHART ===
+    function animateDonut(targetPercent) {
+      const circle = document.querySelector('.circle-progress');
+      const text = document.getElementById('percentValue');
+      const radius = 90;
+      const circumference = 2 * Math.PI * radius;
+      circle.style.strokeDasharray = `${circumference} ${circumference}`;
+      let current = 0;
+
+      function step() {
+        current += (targetPercent - current) * 0.1;
+        if (Math.abs(current - targetPercent) < 0.1) current = targetPercent;
+        const offset = circumference - (current / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        const color = current <= 65 ? "#f43f5e" : current >= 85 ? "#2AC793" : "#facc15";
+        circle.style.stroke = color;
+        text.style.color = color;
+        text.textContent = current.toFixed(1) + '%';
+        if (current < targetPercent) requestAnimationFrame(step);
+        else {
+          if (targetPercent >= 85) {
+            launchConfetti();
+            showCelebrationMessage(targetPercent);
+          }
+          circle.style.boxShadow = targetPercent >= 90 ? '0 0 20px rgba(22, 163, 74, 0.6)' : 'none';
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // === CARGAR DATOS ===
+    async function loadData() {
+      const container = document.getElementById('resultContainer');
+      container.innerHTML = '<div class="loader"></div>';
+      try {
+        const { data, error } = await supabase.from('notas_capl').select('*');
+        if (error) throw error;
+        allData = data;
+        container.innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
+      } catch (err) {
+        container.innerHTML = `<div class="error">❌ Error: ${err.message}</div>`;
+        console.error(err);
+      }
+    }
+
+    // === BUSCAR POR DNI ===
+    async function searchByDNI() {
+      const dni = document.getElementById('dniInput').value.trim();
+      if (!dni) return alert("Ingresa un DNI");
+
+      if (!allData.length) await loadData();
+
+      const filtered = allData.filter(r => 
+        r.dni && r.dni.toString().includes(dni)
+      );
+
+      if (filtered.length === 0) {
+        document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
+        document.getElementById('errorContainer').innerHTML = "";
+        return;
+      }
+
+      const nombre = filtered[0]?.agente || "Sin nombre";
+      const weeks = [...new Set(filtered.map(r => r.semana || 'Sin semana'))].sort();
+      const notaGlobal = calcAvg(filtered.map(r => parseToPercent(r.nota)));
+
+      // --- RENDERIZAR TABLA IZQUIERDA ---
+      let table = `<h3>Resultados para: ${nombre}`;
+      if (notaGlobal >= 85) {
+        table += `<span style="display:inline-block;background:#fbbf24;color:#1e293b;font-size:0.7rem;padding:2px 8px;border-radius:12px;margin-left:8px;font-weight:600;">🌟 Excelente</span>`;
+      }
+      table += `</h3><table><thead><tr><th>Bloques</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+      
+      COLUMNS.forEach(col => {
+        table += `<tr><td>${col.label}</td>`;
+        weeks.forEach(w => {
+          const vals = filtered
+            .filter(r => (r.semana || 'Sin semana') === w)
+            .map(r => parseToPercent(r[col.key]))
+            .filter(v => v !== null);
+          const avg = calcAvg(vals);
+          table += `<td class="${getColorClass(avg)}" data-tooltip="${avg.toFixed(1)}%" style="--bar-width:${avg}%">${avg.toFixed(1)}%</td>`;
+        });
+        table += '</tr>';
       });
-      html += `</tr>`;
-    });
-    html += `</tbody></table>`;
+      table += '</tbody></table><div class="divider"></div>';
+      table += `
+        <div class="chart-container">
+          <svg viewBox="0 0 200 200">
+            <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+            <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+          </svg>
+          <div class="percentage" id="percentValue">0%</div>
+        </div>
+        <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>
+      `;
 
-    output.innerHTML = html;
-  },
-  error: function(err) {
-    document.getElementById('status').className = 'error';
-    document.getElementById('status').textContent = `❌ Error: ${err.message}`;
-    console.error("Error al cargar CSV:", err);
-  }
-});
-</script>
+      if (notaGlobal < 85) {
+        const worst = COLUMNS.slice(0, -1).reduce((w, col) => {
+          const avg = calcAvg(filtered.map(r => parseToPercent(r[col.key])));
+          return avg < w.avg ? { key: col.label, avg } : w;
+        }, { key: '', avg: 100 });
+        table += `<div class="suggestion-box">💡 <strong>Sugerencia:</strong> Tu bloque a mejorar es <strong>${worst.key}</strong> (${worst.avg.toFixed(1)}%).</div>`;
+      }
+
+      if (weeks.length > 1) {
+        const lastTwo = weeks.slice(-2);
+        const lastNote = calcAvg(filtered.filter(r => r.semana === lastTwo[1]).map(r => parseToPercent(r.nota)));
+        const prevNote = calcAvg(filtered.filter(r => r.semana === lastTwo[0]).map(r => parseToPercent(r.nota)));
+        if (!isNaN(lastNote) && !isNaN(prevNote)) {
+          const diff = lastNote - prevNote;
+          const trend = diff > 0 ? { cls: 'trend-up', icon: '📈', txt: `+${diff.toFixed(1)}%` } :
+                       diff < 0 ? { cls: 'trend-down', icon: '📉', txt: `${diff.toFixed(1)}%` } :
+                       { cls: 'trend-flat', icon: '↔️', txt: `${diff.toFixed(1)}%` };
+          table += `<div style="margin-top:8px;text-align:center;"><span class="trend-indicator ${trend.cls}">${trend.icon} ${trend.txt} vs semana anterior</span></div>`;
+        }
+      }
+
+      document.getElementById('resultContainer').innerHTML = table;
+      animateDonut(notaGlobal);
+
+      // --- RENDERIZAR TABLA DERECHA ---
+      let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+      DETAIL_COLUMNS.forEach(col => {
+        detail += `<tr><td>${col.label}</td>`;
+        weeks.forEach(w => {
+          const sum = filtered
+            .filter(r => (r.semana || 'Sin semana') === w)
+            .reduce((acc, r) => acc + (r[col.key] || 0), 0);
+          detail += `<td class="${sum >= 1 ? 'cell-error' : 'cell-ok'}" data-tooltip="${sum}" style="--bar-width:${Math.min(100, sum * 5)}%">${sum >= 1 ? '❌' : '✅'}</td>`;
+        });
+        detail += '</tr>';
+      });
+      detail += '</tbody></table>';
+      document.getElementById('errorContainer').innerHTML = detail;
+      showStatusMessage();
+    }
+
+    // === EVENTOS ===
+    document.getElementById('btnSearch').addEventListener('click', searchByDNI);
+    document.getElementById('dniInput').addEventListener('keyup', e => {
+      if (e.key === 'Enter') searchByDNI();
+    });
+
+    window.onload = () => {
+      initConfetti();
+      // Opcional: cargar datos al inicio si son pocos
+      // loadData();
+    };
+  </script>
 </body>
 </html>
