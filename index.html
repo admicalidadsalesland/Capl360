@@ -214,6 +214,23 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 .cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 4px; }
 .cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 4px; }
 
+.info {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.error {
+  text-align: center;
+  padding: 20px;
+  color: #b91c1c;
+  font-size: 0.95rem;
+  background: #fee2e2;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
 .status-message {
   position: fixed;
   bottom: 20px;
@@ -292,6 +309,16 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   margin: 16px auto;
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
+
+.debug-info {
+  margin-top: 12px;
+  padding: 10px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #475569;
+  font-family: monospace;
+}
 
 @media (max-width: 900px) {
   main { flex-direction: column; padding: calc(var(--menu-height) + 20px) 16px 16px 16px; }
@@ -503,25 +530,36 @@ function showStatusMessage(msg = "Notas de calidad cargadas") {
   setTimeout(()=> status.classList.remove('show'), 5000);
 }
 
-// 🔥 NUEVO: forzar DNI como string y buscar con tolerancia
 function loadData() {
-  return new Promise((resolve)=>{
+  return new Promise((resolve, reject)=>{
     const container = document.getElementById('resultContainer');
     container.innerHTML = '<div class="loader"></div>';
+    
     Papa.parse(CSV_URL, {
       download: true,
       header: true,
-      transform: function(value, field) {
-        if (field === 'DNI') {
-          // Convertir a string y limpiar espacios
-          return String(value).trim();
-        }
-        return value;
-      },
+      skipEmptyLines: true,
+      dynamicTyping: false,
       complete: function(results) {
-        allData = results.data.filter(row => row.DNI && row.DNI.trim() !== '');
-        container.innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
-        resolve();
+        allData = results.data
+          .filter(row => row.DNI && String(row.DNI).trim() !== '')
+          .map(row => {
+            const normalizedRow = {...row};
+            normalizedRow.DNI = String(row.DNI).trim();
+            return normalizedRow;
+          });
+        
+        if (allData.length === 0) {
+          container.innerHTML = '<div class="error">⚠️ No se pudieron cargar los datos del CSV</div>';
+          reject('No data loaded');
+        } else {
+          container.innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
+          resolve();
+        }
+      },
+      error: function(error) {
+        container.innerHTML = '<div class="error">❌ Error al cargar los datos</div>';
+        reject(error);
       }
     });
   });
@@ -569,50 +607,80 @@ function animateDonut(targetPercent) {
 
 async function searchByDNI() {
   const dniInput = document.getElementById('dniInput').value.trim();
-  if(!dniInput) return alert("Ingresa un DNI");
-  if(!allData.length) await loadData();
+  
+  if(!dniInput) {
+    alert("Por favor, ingresa un DNI");
+    return;
+  }
+  
+  if(!allData.length) {
+    try {
+      await loadData();
+    } catch(e) {
+      return;
+    }
+  }
 
-  // 🔥 Búsqueda flexible: convertir a string y comparar
   const dniBuscado = String(dniInput).trim();
-  const filtered = allData.filter(r => {
-    const dniRow = String(r.DNI || '').trim();
-    return dniRow === dniBuscado;
-  });
+  let filtered = allData.filter(r => String(r.DNI || '').trim() === dniBuscado);
+
+  if (!filtered.length) {
+    filtered = allData.filter(r => String(r.DNI || '').trim().includes(dniBuscado));
+  }
 
   if(!filtered.length){
-    document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dniInput}</div>`;
-    document.getElementById('errorContainer').innerHTML = "";
+    const availableDNIs = [...new Set(allData.map(r => r.DNI))].slice(0, 10);
+    document.getElementById('resultContainer').innerHTML = `
+      <div class="error">
+        ❌ No se encontró el DNI: <strong>${dniInput}</strong>
+        <div class="debug-info">
+          DNIs disponibles (primeros 10):<br>
+          ${availableDNIs.join(', ')}
+        </div>
+      </div>
+    `;
+    document.getElementById('errorContainer').innerHTML = '<div class="info">Sin datos para mostrar</div>';
     return;
   }
 
   const nombre = filtered[0]?.AGENTE || "Sin nombre";
   const weeks = [...new Set(filtered.map(r=>r.SEMANA||'Sin semana'))].sort();
-
-  let table = `<h3>Resultados para: ${nombre}`;
   const notaGlobal = calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
+
+  // ✅ ENCABEZADO CORREGIDO
+  let headerText = `Resultados para: ${nombre}`;
   if (notaGlobal >= 85) {
-    table += `<span style="display: inline-block; background: #fbbf24; color: #1e293b; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 600;">🌟 Excelente</span>`;
+    headerText += `<span style="display: inline-block; background: #fbbf24; color: #1e293b; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 600;">🌟 Excelente</span>`;
   }
-  table += `</h3><table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-  COLUMNS.forEach(col=>{
-    table+=`<tr><td>${col.label}</td>`;
-    weeks.forEach(w=>{
-      const vals = filtered.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseToPercent(r[col.key])).filter(x=>x!==null);
+  let table = `<h3>${headerText}</h3>`;
+
+  // Tabla de bloques
+  table += `<table><thead><tr><th>Bloques</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+
+  COLUMNS.forEach(col => {
+    table += `<tr><td>${col.label}</td>`;
+    weeks.forEach(w => {
+      const vals = filtered
+        .filter(r => (r.SEMANA || 'Sin semana') === w)
+        .map(r => parseToPercent(r[col.key]))
+        .filter(x => x !== null);
       const avgWeek = calcAvg(vals);
       const cls = getColorClass(avgWeek);
-      table+=`<td class="${cls}" data-tooltip="${avgWeek.toFixed(1)}%" style="--bar-width:${avgWeek}%">`+avgWeek.toFixed(1)+'%</td>';
+      table += `<td class="${cls}" data-tooltip="${avgWeek.toFixed(1)}%" style="--bar-width:${avgWeek}%">${avgWeek.toFixed(1)}%</td>`;
     });
-    table+='</tr>';
+    table += '</tr>';
   });
-  table+='</tbody></table><div class="divider"></div>';
-  table+=`<div class="chart-container">
-            <svg viewBox="0 0 200 200">
-              <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-              <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
-            </svg>
-            <div class="percentage" id="percentValue">0%</div>
-          </div>
-          <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
+  table += '</tbody></table>';
+
+  table += `<div class="divider"></div>
+            <div class="chart-container">
+              <svg viewBox="0 0 200 200">
+                <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+              </svg>
+              <div class="percentage" id="percentValue">0%</div>
+            </div>
+            <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
 
   if (notaGlobal < 85) {
     const worstBlock = COLUMNS.slice(0, -1).reduce((worst, col) => {
@@ -673,7 +741,7 @@ async function searchByDNI() {
   detail+='</tbody></table>';
 
   document.getElementById('errorContainer').innerHTML = detail;
-  showStatusMessage();
+  showStatusMessage('Datos cargados correctamente');
 }
 
 document.getElementById('btnSearch').addEventListener('click', searchByDNI);
@@ -682,8 +750,8 @@ document.getElementById('dniInput').addEventListener('keyup', e=>{
 });
 
 window.onload = () => {
-    initConfetti();
-    loadData();
+  initConfetti();
+  loadData();
 };
 </script>
 </body>
