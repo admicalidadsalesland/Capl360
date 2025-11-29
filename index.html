@@ -360,14 +360,26 @@
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    // 🔑 CONFIGURACIÓN — ¡REEMPLAZA ESTO CON TUS DATOS REALES!
+<script>
+  // Esperar a que el SDK de Supabase esté cargado
+  window.addEventListener('load', async () => {
+    // Verificar que supabase esté disponible
+    if (!window.supabase) {
+      console.error("❌ Supabase SDK no cargado.");
+      return;
+    }
+
+    // Inicializar cliente
     const SUPABASE_URL = "https://sylucvtlscfcerqqtrpy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bHVjdnRsc2NmY2VycXF0cnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODQ2NTYsImV4cCI6MjA3ODM2MDY1Nn0.opybqq7PK-GMYWFrJbSdCOenmpkkbMFO-K3u5ahQUWY";
 
-    // Inicializar Supabase
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // --- [TU CÓDIGO RESTANTE AQUÍ] ---
+    // (Mantén todo lo demás igual: funciones, loadData, searchByDNI, etc.)
+    // Solo asegúrate de que NO uses "supabase" fuera de esta función load
+    
+    // === TU CÓDIGO COMPLETO A PARTIR DE AQUÍ ===
+    
     // Columnas según tu tabla
     const COLUMNS = [
       { key: 'c_1', label: 'Sondeo y levantamiento de inf.' },
@@ -623,11 +635,12 @@
       if (e.key === 'Enter') searchByDNI();
     });
 
-    window.onload = () => {
-      initConfetti();
-      // Opcional: cargar datos al inicio si son pocos
-      // loadData();
-    };
-  </script>
+    // Inicializar confeti
+    initConfetti();
+
+    // Opcional: cargar datos al inicio si son pocos
+    // loadData();
+  });
+</script>
 </body>
 </html>
