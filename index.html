@@ -357,28 +357,26 @@
   <canvas id="confetti-canvas"></canvas>
   <div id="celebration-message">¡Felicidades!</div>
 
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Supabase SDK v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // Esperar a que el SDK de Supabase esté cargado
+  // Esperar a que el DOM y Supabase estén listos
   window.addEventListener('load', async () => {
-    // Verificar que supabase esté disponible
+    // Verificar que Supabase esté disponible
     if (!window.supabase) {
       console.error("❌ Supabase SDK no cargado.");
       return;
     }
 
-    // Inicializar cliente
+    // ✅ Inicializar cliente (v2 correcto)
     const SUPABASE_URL = "https://sylucvtlscfcerqqtrpy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bHVjdnRsc2NmY2VycXF0cnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODQ2NTYsImV4cCI6MjA3ODM2MDY1Nn0.opybqq7PK-GMYWFrJbSdCOenmpkkbMFO-K3u5ahQUWY";
-
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- [TU CÓDIGO RESTANTE AQUÍ] ---
     // (Mantén todo lo demás igual: funciones, loadData, searchByDNI, etc.)
-    // Solo asegúrate de que NO uses "supabase" fuera de esta función load
-    
-    // === TU CÓDIGO COMPLETO A PARTIR DE AQUÍ ===
     
     // Columnas según tu tabla
     const COLUMNS = [
@@ -526,6 +524,7 @@
       const container = document.getElementById('resultContainer');
       container.innerHTML = '<div class="loader"></div>';
       try {
+        // ✅ CORRECTO EN V2: supabase.from(...).select(...)
         const { data, error } = await supabase.from('notas_capl').select('*');
         if (error) throw error;
         allData = data;
@@ -642,5 +641,7 @@
     // loadData();
   });
 </script>
+
+  
 </body>
 </html>
