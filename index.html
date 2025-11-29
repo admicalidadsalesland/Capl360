@@ -374,10 +374,10 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
-// ✅ URL LIMPIA — sin espacios
+// ✅ URL limpia
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT77CaeayP6AwFoZl5EvFOFeI7IOMd6ewmJPDU9TEmCGmy0GJiaaoJ9kl7T85ttEc81uO7wQu5bgAb8/pub?gid=1199818084&single=true&output=csv";
 
-// ✅ COLUMNAS ACTUALIZADAS — según tus nuevas cabeceras
+// ✅ Columnas actualizadas
 const COLUMNS = [
   { key: 'C_1 Sondeo y levantamiento de información', label: 'Sondeo y levantamiento' },
   { key: 'C_2 Claridad en el ofrecimiento', label: 'Claridad en ofrecimiento' },
@@ -598,7 +598,21 @@ async function searchByDNI() {
   if (!dni) return alert("Ingresa un DNI");
   if (!allData.length) await loadData();
 
-  const filtered = allData.filter(r => r.DNI && String(r.DNI).trim() === dni);
+  // ✅ Búsqueda FLEXIBLE
+  const dniBuscado = String(dni).trim();
+  let filtered = allData.filter(r => {
+    const dniRow = String(r.DNI || '').trim();
+    return dniRow === dniBuscado;
+  });
+
+  // ✅ Fallback: búsqueda parcial (por si hay espacios o caracteres extra)
+  if (!filtered.length) {
+    filtered = allData.filter(r => {
+      const dniRow = String(r.DNI || '').trim();
+      return dniRow.includes(dniBuscado);
+    });
+  }
+
   if (!filtered.length) {
     document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
     document.getElementById('errorContainer').innerHTML = "";
