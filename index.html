@@ -601,14 +601,29 @@
         
         COLUMNS.forEach(col => {
           table += `<tr><td>${col.label}</td>`;
-          weeks.forEach(w => {
-            const vals = filtered
-              .filter(r => (r.semana || 'Sin semana') === w)
-              .map(r => parseToPercent(r[col.key]))
-              .filter(v => v !== null);
-            const avg = calcAvg(vals);
-            table += `<td class="${getColorClass(avg)}" data-tooltip="${avg.toFixed(1)}%" style="--bar-width:${avg}%">${avg.toFixed(1)}%</td>`;
-          });
+weeks.forEach(w => {
+  const weekRecords = filtered.filter(r => (r.semana || 'Sin semana') === w);
+  const rawValues = weekRecords.map(r => r[col.key]);
+  
+  // Verificar si TODOS los valores son nulos, vacíos o no numéricos
+  const hasValidValue = rawValues.some(val => {
+    if (val == null || val === '') return false;
+    const num = parseFloat(val);
+    return !isNaN(num);
+  });
+
+  if (!hasValidValue) {
+    // No aplica → mostrar guion
+    table += `<td style="color: var(--text-muted);">—</td>`;
+  } else {
+    // Hay al menos un valor válido → calcular promedio
+    const validPercents = rawValues
+      .map(v => parseToPercent(v))
+      .filter(v => v !== null);
+    const avg = calcAvg(validPercents);
+    table += `<td class="${getColorClass(avg)}" data-tooltip="${avg.toFixed(1)}%" style="--bar-width:${avg}%">${avg.toFixed(1)}%</td>`;
+  }
+});
           table += '</tr>';
         });
         table += '</tbody></table><div class="divider"></div>';
