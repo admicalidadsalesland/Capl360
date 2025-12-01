@@ -390,10 +390,40 @@
       { key: 'nota', label: 'Nota General' }
     ];
 
-    const DETAIL_COLUMNS = Array.from({ length: 21 }, (_, i) => ({
-      key: `item_${i + 1}`,
-      label: `Ítem ${i + 1}`
-    }));
+   const DETAIL_COLUMNS = [
+  { key: 'dni', label: 'DNI' },
+  { key: 'agente', label: 'AGENTE' },
+  { key: 'semana', label: 'SEMANA' },
+  { key: 'c_1', label: 'C_1 Sondeo y levantamiento de información' },
+  { key: 'c_2', label: 'C_2 Claridad en el ofrecimiento' },
+  { key: 'c_3', label: 'C_3 Regulado y protocolo' },
+  { key: 'c_4', label: 'C_4 Induce a la baja' },
+  { key: 'c_5', label: 'C_5 Facturación' },
+  { key: 'c_6', label: 'C_6 Recordatorio de bono' },
+  { key: 'nota', label: 'NOTA' },
+  { key: 'fecha', label: 'FECHA' },
+  { key: 'item_1', label: '1.1 Solicita consentimiento' },
+  { key: 'item_2', label: '1.2 Valida titularidad de cliente en abordaje' },
+  { key: 'item_3', label: '1.3 Aborda con argumento de necesidad de gb' },
+  { key: 'item_4', label: '1.4 Información total de gb del plan a ofrecer' },
+  { key: 'item_5', label: '2.1 Ofrece plan según oferta base' },
+  { key: 'item_6', label: '2.2 Informa correctamente 3 beneficios del plan a ofrecer' },
+  { key: 'item_7', label: '2.3 Para base de clientes con alto consumo de gb' },
+  { key: 'item_8', label: '2.4 Crea la necesidad de contar con más gb de internet' },
+  { key: 'item_9', label: '2.5 Indica si el cliente navegó a baja velocidad' },
+  { key: 'item_10', label: '2.6 Indica al cliente, según base, los 2 aplicativos que más utiliza (indirectamente según speech)' },
+  { key: 'item_11', label: '2.7 Rebate las objeciones del cliente' },
+  { key: 'item_12', label: '2.8 Efectúa el sondeo de necesidades del cliente (2 veces en rebate)' },
+  { key: 'item_13', label: '2.9 Informa claramente cuándo se hará efectivo el CAPL' },
+  { key: 'item_14', label: '2.10 Primer rebate: identifica la necesidad del cliente como argumento para capl' },
+  { key: 'item_15', label: '2.11 Efectúa el sondeo de necesidades del cliente (específicamente en rebate)' },
+  { key: 'item_16', label: '3.1 Solicita y valida correctamente los datos del titular' },
+  { key: 'item_17', label: '3.2 No modifica u omite palabras de la lectura del contrato' },
+  { key: 'item_18', label: '3.3 Solicita consentimiento de tratamiento de información' },
+  { key: 'item_19', label: '4.1 No utiliza la baja a futuro como argumento de venta' },
+  { key: 'item_20', label: '5.1 Explica correctamente ciclo de facturación' },
+  { key: 'item_21', label: '6.1 Refuerza en la despedida, el bono' }
+];
 
     let allData = [];
     let confettiCanvas, confettiCtx;
